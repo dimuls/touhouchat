@@ -13,7 +13,12 @@ ul {
   list-style-type: none;
 }
 
-.area {
+#cl-count {
+  position: fixed;
+  left: 10px;
+  bottom: 10px;
+  width: 280px;
+  text-align: center;
 }
 
 #ctrls {

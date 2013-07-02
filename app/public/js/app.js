@@ -14,6 +14,7 @@ app.Model = function() {
   var self = this;
 
   /* Init data */
+  self.clientsCount = ko.observable('');
   self.msgText = ko.observable('');
   self.msgs = ko.observableArray();
 
@@ -39,6 +40,10 @@ app.Model = function() {
         break;
       case 'set msgs':
         self.msgs(msg.data);
+        $(document).scrollTop($(document).height());
+        break;
+      case 'set client count':
+	self.clientsCount(self.data);
         break;
       case 'error':
         alert(msg.data);

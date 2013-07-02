@@ -20,6 +20,10 @@
   </li>
 </ul>
 
+<div id="cl-count" data-bind="text: clientsCount">
+asd
+</div>
+
 <ul id="msgs" data-bind="foreach: msgs">
   <li class="msg">
     <div class="hdr" data-bind="text: dt"></div>

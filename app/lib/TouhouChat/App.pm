@@ -30,6 +30,9 @@ sub handle {
     $msgs = [];
     $self->room->store('msgs', $msgs);
   }
+
+  $self->room->send(msg 'set client count', $self->room->clients_count);
+
   $self->on(json => sub {
     my ($c, $msg) = @_;
     given( $msg->{cmd} ) {
@@ -54,6 +57,7 @@ sub handle {
   });
   $self->on(finish => sub {
     $self->rooms->remove_client($room_id, $self->cid);
+    $self->room->send(msg 'set client count', $self->room->clients_count);
   });
 }
 
