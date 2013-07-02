@@ -39,14 +39,17 @@ app.Model = function() {
         }
         break;
       case 'set msgs':
-        self.msgs(msg.data);
+        console.log(msg);
         $(document).scrollTop($(document).height());
         break;
       case 'set client count':
-	self.clientsCount(self.data);
+        self.clientsCount(msg.data);
         break;
       case 'error':
         alert(msg.data);
+        break;
+      default: 
+        console.log(msg);
       break;
     }
   };

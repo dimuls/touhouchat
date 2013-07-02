@@ -18,11 +18,12 @@
       </li>
     </ul>
   </li>
-</ul>
 
-<div id="cl-count" data-bind="text: clientsCount">
-asd
-</div>
+  <li id="cl-count">
+    Кол-во клиентов: <span data-bind="text: clientsCount"></span>
+  </li>
+
+</ul>
 
 <ul id="msgs" data-bind="foreach: msgs">
   <li class="msg">

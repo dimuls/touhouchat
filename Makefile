@@ -4,8 +4,12 @@ PROJECT_ROOT = /$(SITES_PATH)/$(APP_NAME)
 NGINX_ROOT = /etc/nginx/
 APP_SCRIPT = script/touhou_chat
 
-deploy: stop deploy_app start
+deploy:
+	make stop
 	service nginx restart
+	make deploy_app
+	make start
+
 
 stop:
 	su -l www-data -c 'cd $(PROJECT_ROOT); hypnotoad -s $(APP_SCRIPT)'
