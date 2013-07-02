@@ -20,7 +20,7 @@ app.Model = function() {
 
   /* Websocket connection */
   self.connectApp = function() {
-    self.ws = new WebSocket('ws://localhost:3000/app/' + __ROOM__);
+    self.ws = new WebSocket('ws://touhouchat.tomago.ru/app/' + __ROOM__);
   }
   self.connectApp();
   self.ws.onopen = function() {};
