@@ -1,6 +1,7 @@
 package TouhouChat;
 
 use Mojo::Base 'Mojolicious';
+use Mojolicious::Plugin::Config;
 use Websocket::Rooms;
 
 # This method will run once at server start
@@ -10,7 +11,8 @@ sub startup {
   # Documentation browser under "/perldoc"
   $self->plugin('PODRenderer');
   #$self->plugin('DefaultHelpers');
- 
+  $self->plugin('Config');
+
   $self->secret('AOIShq092u0qdh08dH)*HR#)@*hf32q0fq-H*)#@HDF)A8fh10');
 
   # Websocket helpers
