@@ -31,7 +31,7 @@ sub handle {
     $self->room->store('msgs', $msgs);
   }
 
-  $self->room->send(msg 'set client count', $self->room->clients_count);
+  $self->room->send(msg 'set clients count', $self->room->clients_count);
 
   $self->on(json => sub {
     my ($c, $msg) = @_;

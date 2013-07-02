@@ -39,10 +39,10 @@ app.Model = function() {
         }
         break;
       case 'set msgs':
-        console.log(msg);
+        self.msgs(msg.data);
         $(document).scrollTop($(document).height());
         break;
-      case 'set client count':
+      case 'set clients count':
         self.clientsCount(msg.data);
         break;
       case 'error':
@@ -50,7 +50,7 @@ app.Model = function() {
         break;
       default: 
         console.log(msg);
-      break;
+        break;
     }
   };
 
