@@ -30,10 +30,8 @@ deploy_app:
 	make start
 
 deploy:
-	make stop
 	make deploy_app
 	make deploy_nginx
-	make start
 
 enable:
 	ln -s $(SITES_PATH)/.config/sites-available/$(APP_NAME) $(SITES_PATH)/.config/sites-enabled/$(APP_NAME)

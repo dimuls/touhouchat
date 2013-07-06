@@ -31,6 +31,10 @@ app.Model = function() {
     if( self.scrollOnBottom ) {
       self.scrollToBottom();
     }
+    if( !msg.author ) {
+      self.playMessageSound();
+      $.titleAlert('Новое сообщение', { requireBlur: true  });//stopOnMouseMove: true });
+    }
   });
   self.ws.on('set msgs', function(msgs) {
     self.msgs(msgs);
@@ -69,6 +73,25 @@ app.Model = function() {
     $(document).scrollTop($(document).height());
   };
 
+  /* Init sound system */
+  self.playMessageSound = function () {};
+  soundManager.setup({
+    url: '/swf/soundmanager.swf',
+    preferFlash: false,
+    onready: function() {
+      var messageSound = soundManager.createSound({
+        id: 'message',
+        url: '/sfx/message.ogg',
+        autoLoad: true,
+        autoPlay: false,
+        volume: 50
+      }); 
+      self.playMessageSound = function () {
+        messageSound.play();
+      };
+    }
+  });
+
   /* Init pages routing */
   self.page = ko.observable();
   
@@ -87,6 +110,7 @@ app.Model = function() {
   self.changePage('/b');
 }
 
-app.model = new app.Model();
-
-ko.applyBindings(app.model);
+$(document).ready(function() {
+  app.model = new app.Model();
+  ko.applyBindings(app.model);
+});

@@ -76,12 +76,20 @@ function writeMsg(c, text) {
   text.replace(/\n+/, '<br/>');
   text.replace(/\s+/, ' ');
 
-  var msg = { text: text, dt: m().format('DD-MM-YYYY HH:mm:ss') };
+  var msg = {
+    text: text,
+    dt: m().format('DD-MM-YYYY HH:mm:ss'),
+  };
   if( msgs[c.chatRoom].length >= 100 ) {
     msgs[c.chatRoom].shift();
   }
   msgs[c.chatRoom].push(msg);
-  io.of('/chat').in(c.chatRoom).emit('chat msg', msg);
+  
+  msg.author = false;
+  c.broadcast.to(c.chatRoom).emit('chat msg', msg);
+
+  msg.author = true;
+  c.emit('chat msg', msg);
 }
 
 io
