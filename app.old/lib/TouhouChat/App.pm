@@ -53,6 +53,10 @@ sub handle {
         shift @$msgs if scalar @$msgs >= 100;
         push @$msgs, $msg_data;
       }
+      when( 'leave' ) {
+        $self->rooms->remove_client($room_id, $self->cid);
+        $self->room->send(msg 'set client count', $self->room->clients_count);
+      }
     }
   });
   $self->on(finish => sub {

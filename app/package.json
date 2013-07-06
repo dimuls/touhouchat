@@ -1,0 +1,12 @@
+{
+  "name": "touhouchat",
+  "version": "1",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "moment": "*",
+    "socket.io": "*"
+  }
+}

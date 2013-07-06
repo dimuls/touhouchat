@@ -13,39 +13,11 @@ ul {
   list-style-type: none;
 }
 
-
-
-.btn {
-  border: none;
-  background: black;
-  color: white;
-  padding: 5px;
-  border-radius: 5px;
-}
-.btn:hover {
-  background: white;
-  color: black;
-  box-shadow: black 0px 0px 4px;
-}
-.btn.active,
-.btn.active:hover {
-  background: lightgrey;
-  color: black;
-  box-shadow: none;
-}
-.btn:active {
-  background: lightgrey;
-}
-
-
-
-
 #cl-count {
   position: fixed;
-  right: 10px;
-  top: 5px;
+  left: 10px;
+  bottom: 10px;
   text-align: left;
-  font-size: 14px;
 }
 
 #ctrls {
@@ -67,11 +39,28 @@ ul {
   cursor: default;
 }
 
-#ctrls .ctrl.rooms span {
+#ctrls .ctrl.rooms a {
   display: inline-block;
   text-decoration: none;
+  background: black;
+  color: white;
+  padding: 5px;
+  border-radius: 5px;
 }
-
+#ctrls .ctrl.rooms a:hover {
+  border: 1px solid black;
+  padding: 4px;
+  background: white;
+  color: black;
+}
+#ctrls .ctrl.rooms a.active {
+  background: lightgrey;
+  color: black;
+}
+#ctrls .ctrl.rooms a.active:hover {
+  border: none;
+  padding: 5px;
+}
 
 #ctrls .ctrl {
   padding: 10px 0px;
@@ -114,6 +103,22 @@ ul {
   padding: 5px;
   border: 1px solid black;
 }
+
+#btn-send {
+  padding: 5px;
+  border: 1px solid black;
+  background: black;
+  color: white;
+}
+#btn-send:hover {
+  background: white;
+  color: black;
+}
+#btn-send:active {
+  padding: 3px;
+  margin: 2px;
+}
+
 
 #msgs {
   box-sizing: border-box;
