@@ -16,6 +16,10 @@ stop:
 start:
 	su -l $(APP_USER) -c 'forever start --sourceDir $(PROJECT_ROOT) app.js'
 
+restart:
+	make stop
+	make start
+
 deploy_nginx:
 	cp ./nginx.conf $(NGINX_ROOT)/sites-enabled/$(APP_NAME)
 	service nginx restart

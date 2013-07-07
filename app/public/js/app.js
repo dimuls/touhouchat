@@ -18,7 +18,7 @@ app.Model = function() {
   self.clientsCount = ko.observable('');
   self.msgText = ko.observable('');
   self.msgs = ko.observableArray();
-  self.predefinedRooms = ko.observableArray(['b', 'to', 'rm']);
+  self.predefinedRooms = ko.observableArray(['b', 'rm', 'to']);
 
   /* Websocket configuration */
   self.ws = io.connect('http://touhouchat.tomago.ru/chat');
@@ -102,12 +102,12 @@ app.Model = function() {
  
   /* Init router */
   Sammy(function() {
-    this.get("#/:room", function() {
+    this.get("#:room", function() {
       self.changeRoom(this.params['room']);
     });
   }).run();
   
-  self.changePage('/b');
+  self.changePage('b');
 }
 
 $(document).ready(function() {

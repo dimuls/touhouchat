@@ -131,6 +131,11 @@ ul {
   border-bottom: none;
 }
 
+#msgs .msg .txt {
+  max-height: 200px;
+  overflow: auto;
+}
+
 #msgs .msg .hdr {
   font-size: 12px;
   margin-bottom: 5px;

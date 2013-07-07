@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>touhouchat / v1</title>
+    <title>touhouchat / v1.0.2</title>
     <link href="/css/main.css" rel="stylesheet">
     <script src="/js/lib/prefixfree.js"></script>
     <script src="/js/lib/modernizr.js"></script>
   </head>
   <body>
     <ul id="ctrls">
-      <li class="ctrl hdr">touhouchat / v1</li>
+      <li class="ctrl hdr">touhouchat / v1.0.2</li>
       <li class="ctrl rooms" data-bind="foreach: predefinedRooms" >
         <span class="btn" data-bind="
           text: $data,
           click: function(data, event) {
-            if( $root.room !== $data ) $root.changePage('/' + data)
+            if( $root.room !== $data ) $root.changePage(data)
           },
           css: { active: $root.room() == $data }
         "></span>
@@ -33,7 +33,7 @@
     <ul id="msgs" data-bind="foreach: msgs">
       <li class="msg">
         <div class="hdr" data-bind="text: dt"></div>
-        <div class="txt" data-bind="text: text"></div>
+        <div class="txt" data-bind="html: text"></div>
       </li>
     </ul>
 

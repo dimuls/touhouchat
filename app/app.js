@@ -13,7 +13,9 @@ var io = require('socket.io').listen(app.listen(8081));
 
 */
 
-var m = require('moment')
+var escapeHtml = require('escape-html')
+  , gruff = require('./lib/gruff')
+  , m = require('moment')
   , io = require('socket.io').listen(8081);
 
 io.configure('production', function() {
@@ -22,15 +24,14 @@ io.configure('production', function() {
   io.set('transports', [ 'websocket', 'htmlfile', 'xhr-polling', 'jsonp-polling' ]);
 });
 
-var whiteCharsRegexp = /\s+/;
-var validMsgRegexp = /^[\w!@#$%^&*()\-=_+{}\[\]\|:";'<>?,.\/~`]{1, 600}$/;
+//var validMsgRegexp = /^[\w!@#$%^&*()\-=_+{}\[\]\|:";'<>?,.\/~`]{1, 600}$/;
 
 var predefinedRooms = {
-  b: 1, rm: 1, t: 1
+  b: 1, rm: 1, to: 1
 };
 
 var msgs = {
-  b: [], to: [], rm: [],
+  b: [], rm: [], to: []
 };
 
 function leaveRoom(c) {
@@ -49,7 +50,7 @@ function leaveRoom(c) {
 
 function joinRoom(c, room) {
   if( !room.match(/^\w+$/) ) {
-    c.emit('error', 'Room name must contain only word characters.');
+    c.emit('error msg', 'Имя комнаты может содержать только символы алфавита');
     return;
   } else if( c.chatRoom !== undefined ) {
     leaveRoom(c);
@@ -65,9 +66,19 @@ function joinRoom(c, room) {
 
 function writeMsg(c, text) {
   if( c.chatRoom === undefined ) {
-    c.emit('error msg', 'Undefined chat room');
+    c.emit('error msg', 'Неизвестная комната. Попробуйте обновить страницу');
     return;
   }
+
+  text.replace(/(^\s+|\s+$)/, '');
+  if( text.length < 1 || text.length > 5000 ) {
+    c.emit('error msg', 'Сообщение может содержать от 1 до 5000 символов');
+    return;
+  }
+
+  text = gruff(escapeHtml(text));
+
+  /*
   text.replace(/(^\s+|\s+$)/, '');
   if( text.length < 1 || text.length > 600 ) {
     c.emit('error', 'Message length must >1 and <600.');
@@ -75,10 +86,11 @@ function writeMsg(c, text) {
   }
   text.replace(/\n+/, '<br/>');
   text.replace(/\s+/, ' ');
+  */
 
   var msg = {
     text: text,
-    dt: m().format('DD-MM-YYYY HH:mm:ss'),
+    dt: m().format('DD.MM.YYYY HH:mm:ss'),
   };
   if( msgs[c.chatRoom].length >= 100 ) {
     msgs[c.chatRoom].shift();
