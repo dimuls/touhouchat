@@ -1,48 +1,76 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>touhouchat / v1.0.2</title>
+    <title>touhouchat / v1.0.3</title>
+    <link href='http://fonts.googleapis.com/css?family=Ubuntu:300&subset=latin,cyrillic-ext,latin-ext' rel='stylesheet' type='text/css'>
     <link href="/css/main.css" rel="stylesheet">
     <script src="/js/lib/prefixfree.js"></script>
     <script src="/js/lib/modernizr.js"></script>
   </head>
   <body>
     <ul id="ctrls">
-      <li class="ctrl hdr">touhouchat / v1.0.2</li>
-      <li class="ctrl rooms" data-bind="foreach: predefinedRooms" >
+      <li class="ctrl hdr">touhouchat / v1.0.3</li>
+      <li class="ctrl rooms">
+        <!-- ko foreach: predefinedRooms -->
         <span class="btn" data-bind="
           text: $data,
           click: function(data, event) {
-            if( $root.room !== $data ) $root.changePage(data)
+            if( $root.room !== $data ) $root.page(data)
           },
           css: { active: $root.room() == $data }
         "></span>
-      <li>
-      <li class="ctrl">
+        <!-- /ko -->
+        <input id="input-room" title="Введите название Вашей комната" data-bind="value: customRoom, event: { keypress: inputRoomKeyPressed },
+          css: { active: customRoom() == room() }" placeholder="" data-autosize-input='{ "space": 0 }'>
+      </li>
+      <li class="ctrl last">
         <ul id="write-ctrl">
-          <li><textarea id="input-msg" data-bind="value: msgText, valueUpdate: 'afterkeydown', event: { keypress: msgTextKeyPressed }"></textarea></li>
+          <li><textarea id="input-msg" title="Введите Ваше сообщение" data-bind="value: msgText, valueUpdate: 'afterkeydown', event: { keypress: msgTextKeyPressed }"></textarea></li>
           <li class="btns">
-            <button class="btn" data-bind="click: writeMsg">написать</button>
+            <button class="btn btn-light pull-left" title="Очистить поле ввода сообщений" data-bind="click: clearMsg">очистить</button>
+            <button class="btn" title="Отправить сообщение" data-bind="click: writeMsg">написать</button>
+          </li>
+        </ul>
+      </li>
+      <li class="stats">
+        <ul class="rows">
+          <li class="row">
+            <span class="key">кол-во клиентов в комнате:</span>
+            <span class="val" data-bind="text: clientsCount"></span>
+          </li>
+          <li class="row">
+            <span class="key">кол-во клиентов на сайте:</span>
+            <span class="val" data-bind="text: totalClientsCount"></span>
           </li>
         </ul>
       </li>
     </ul>
 
-    <div id="cl-count" data-bind="text: clientsCount"></div>
 
     <ul id="msgs" data-bind="foreach: msgs">
-      <li class="msg">
-        <div class="hdr" data-bind="text: dt"></div>
-        <div class="txt" data-bind="html: text"></div>
+      <li class="msg-outer">
+        <div class="msg" data-bind="attr: { id: 'msg-' + id() }, css: { active: active() }">
+          <div class="hdr">
+            <strong>@<span data-bind="text: id"></span></strong>&nbsp;|&nbsp;<span data-bind="text: dt"></span>&nbsp;|&nbsp;<button class='btn btn-small btn-light' data-bind="click: function(data) { $root.answerMsg(data); }">отв</button>&nbsp;<button class='btn btn-small btn-light' data-bind="click: function(data) { $root.answerMsgQuoted(data); }">отв цит</button>
+            <!-- ko if: active() -->
+              <button class='btn btn-small btn-light' data-bind="click: $root.clearPost">снять выдел</button>
+            <!-- /ko -->
+          </div>
+          <div class="txt" data-bind="html: text"></div>
+        </div>
       </li>
     </ul>
 
     <script src="/js/lib/jquery.js"></script>
     <script src="/js/lib/jquery-throttle-debounce.js"></script>
     <script src="/js/lib/jquery-title-alert.js"></script>
+    <script src="/js/lib/jquery-scroll-to.js"></script>
+    <script src="/js/lib/jquery-autosize-input.js"></script>
+    <script src="/js/lib/jquery-autosize.js"></script>
     <script src="/js/lib/soundmanager.js"></script>
     <script src="/js/lib/sammy.js"></script>
   	<script src="/js/lib/knockout.js"></script>
+  	<script src="/js/lib/knockout-mapping.js"></script>
     <script src="/socket.io/socket.io.js"></script>
   	<script src="/js/app.js"></script>
   </body>

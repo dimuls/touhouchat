@@ -1,0 +1,156 @@
+body {
+  min-width: 800px;
+  margin: 0px;
+  padding: 10px;
+  background: #101010;
+  color: #1b81e5;
+  text-shadow: #1e90ff 0px 0px 10px;
+}
+
+a:link {
+  color: #78bcff;
+  text-shadow: #78bcff 0px 0px 10px;
+}
+
+a:visited {
+  color: #ccb4fb;
+  text-shadow: #ccb4fb 0px 0px 10px;
+}
+
+* {
+  padding: 0px;
+  margin: 0px;
+}
+
+ul {
+  list-style-type: none;
+}
+
+.btn {
+  border: none;
+  background: #1873cc;
+  color: white;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.btn:hover {
+  background: lightgrey;
+  color: #1873cc;
+  box-shadow: lightgrey 0px 0px 15px;
+}
+.btn.active,
+.btn.active:hover {
+  background: lightgrey;
+  color: #1873cc;
+  box-shadow: none;
+}
+.btn:active {
+  background: lightgrey;
+}
+
+#cl-count {
+  position: fixed;
+  right: 10px;
+  top: 5px;
+  text-align: left;
+  font-size: 14px;
+}
+
+#ctrls {
+  box-sizing: border-box;
+  float: left;
+  width: 300px;
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  bottom: 10px;
+  list-style-type: none;
+  border-right: 1px solid #1873cc;
+  user-select: none;
+}
+
+#ctrls .ctrl.hdr,
+#ctrls .ctrl.rooms {
+  text-align: center;
+  cursor: default;
+}
+
+#ctrls .ctrl.rooms span {
+  display: inline-block;
+  text-decoration: none;
+}
+
+
+#ctrls .ctrl {
+  padding: 10px 0px;
+  border-bottom: 1px solid #1873cc;
+}
+
+#ctrls .ctrl:first-child {
+  padding: 0px;
+  padding-bottom: 10px;
+}
+
+#ctrls .ctrl:last-child {
+  padding: 0px;
+  padding-top: 10px;
+  border: none;
+}
+
+#write-ctrl {
+  list-style-type: none;
+  padding-right: 10px;
+}
+
+#write-ctrl li {
+  margin-bottom: 10px;
+}
+
+#write-ctrl li:last-child {
+  margin-bottom: 0px;
+}
+
+#write-ctrl li.btns {
+  text-align: right;
+}
+
+#input-msg {
+  width: 100%;
+  height: 100px;
+  box-sizing: border-box;
+  resize: none;
+  padding: 5px;
+  border: 1px solid #1873cc;
+  background: #101010;
+  color: #1b81e5;
+  text-shadow: #1e90ff 0px 0px 10px;
+}
+
+#msgs {
+  box-sizing: border-box;
+  margin-left: 310px;
+}
+
+#msgs .msg {
+  list-style-type: none;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #1873cc;
+}
+
+#msgs .msg:last-child {
+  padding-bottom: 0px;
+  margin-bottom: 0px;
+  border-bottom: none;
+}
+
+#msgs .msg .txt {
+  max-height: 200px;
+  overflow: auto;
+}
+
+#msgs .msg .hdr {
+  font-size: 12px;
+  margin-bottom: 5px;
+}

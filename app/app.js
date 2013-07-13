@@ -19,12 +19,20 @@ var escapeHtml = require('escape-html')
   , io = require('socket.io').listen(8081);
 
 io.configure('production', function() {
-  io.enable('browser client etag');
-  io.set('log level', 1);
-  io.set('transports', [ 'websocket', 'htmlfile', 'xhr-polling', 'jsonp-polling' ]);
+  io.enable('browser client minification');  // send minified client
+  io.enable('browser client etag');          // apply etag caching logic based on version number
+  io.enable('browser client gzip');          // gzip the file
+  io.set('log level', 1);                    // reduce logging
+  io.set('transports', [                     // enable all transports (optional if you want flashsocket)
+      'websocket'
+    , 'flashsocket'
+    , 'htmlfile'
+    , 'xhr-polling'
+    , 'jsonp-polling'
+  ]);
 });
 
-//var validMsgRegexp = /^[\w!@#$%^&*()\-=_+{}\[\]\|:";'<>?,.\/~`]{1, 600}$/;
+var LOG_SIZE = 100;
 
 var predefinedRooms = {
   b: 1, rm: 1, to: 1
@@ -34,6 +42,10 @@ var msgs = {
   b: [], rm: [], to: []
 };
 
+msgs.b.cnt = 0;
+msgs.rm.cnt = 0;
+msgs.to.cnt = 0;
+
 function leaveRoom(c) {
   if( c.chatRoom === undefined ) {
     return;
@@ -42,6 +54,7 @@ function leaveRoom(c) {
   var clientsCount = io.of('/chat').clients(c.chatRoom).length;
   if( clientsCount > 0 ) {
     io.of('/chat').in(c.chatRoom).emit('set clients count', clientsCount);
+    io.of('/chat').emit('set total clients count', io.of('/chat').clients().length);
   } else if( predefinedRooms[c.chatRoom] == undefined ) {
     delete msgs[c.chatRoom];
   }
@@ -58,8 +71,10 @@ function joinRoom(c, room) {
   c.join(room);
   c.chatRoom = room;
   io.of('/chat').in(room).emit('set clients count', io.of('/chat').clients(room).length);
+  io.of('/chat').emit('set total clients count', io.of('/chat').clients().length);
   if( msgs[room] === undefined ) {
     msgs[room] = [];
+    msgs[room].cnt = 0;
   }
   c.emit('set msgs',  msgs[room]);
 }
@@ -76,25 +91,17 @@ function writeMsg(c, text) {
     return;
   }
 
-  text = gruff(escapeHtml(text));
-
-  /*
-  text.replace(/(^\s+|\s+$)/, '');
-  if( text.length < 1 || text.length > 600 ) {
-    c.emit('error', 'Message length must >1 and <600.');
-    return;
-  }
-  text.replace(/\n+/, '<br/>');
-  text.replace(/\s+/, ' ');
-  */
+  text = gruff(escapeHtml(text), c.chatRoom);
 
   var msg = {
+    id: ++msgs[c.chatRoom].cnt,
     text: text,
     dt: m().format('DD.MM.YYYY HH:mm:ss'),
   };
-  if( msgs[c.chatRoom].length >= 100 ) {
+  if( msgs[c.chatRoom].length >= LOG_SIZE ) {
     msgs[c.chatRoom].shift();
   }
+
   msgs[c.chatRoom].push(msg);
   
   msg.author = false;
@@ -102,6 +109,20 @@ function writeMsg(c, text) {
 
   msg.author = true;
   c.emit('chat msg', msg);
+}
+
+function getMsg(c, data) {
+  if( !data.room.match(/^\w+$/) || !data.id.toString().match(/^\d+$/) ) {
+    c.emit('error msg', 'Неверные данные');
+    return;
+  }
+  var msgs = msgs[data.room];
+  if( msgs && msgs.cnt >= data.id ) {
+    var id = msgs.cnt == data.id ? data.id : data.id % LOG_SIZE;
+    c.emit('msg requested', { status: 'found', msg: msgs[id] });
+  } else {
+    c.emit('msg requested', { status: 'not found' });
+  }
 }
 
 io
@@ -116,8 +137,10 @@ io
     c.on('write msg', function(msg) {
       writeMsg(c, msg);
     });
+    c.on('get msg', function(data) {
+      getMsg(c, data);
+    });
     c.on('disconnect', function() {
-      console.log('disconnected');
       leaveRoom(c);
     });
   });

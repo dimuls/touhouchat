@@ -3,8 +3,35 @@
 */
 
 // App scope
-var app = {};
+var app = {
+  LOG_SIZE: 100
+};
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*   Msg Model
+*/
+app.MsgsMapping = {
+  create: function(opt) {
+    return new app.MsgModel(opt.data);
+  },
+  key: function(msg) {
+    return ko.utils.unwrapObservable(msg.id);
+  }
+};
+
+app.MsgModel = function(msg) {
+  ko.mapping.fromJS(msg, {}, this);
+  var self = this;
+  self.link = ko.computed(function() {
+    return '&' + self.id();
+  }, self);
+  self.linkLong = ko.computed(function() {
+    return '#' + app.model.room() + '&' + self.id();
+  }, self);
+  self.active = ko.computed(function() {
+    return app.model.post() == self.id();
+  }, self);
+};
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 *   App Model
@@ -14,48 +41,25 @@ app.Model = function() {
   var self = this;
 
   /* Init data */
-  self.room = ko.observable('');
   self.clientsCount = ko.observable('');
+  self.totalClientsCount = ko.observable('');
   self.msgText = ko.observable('');
-  self.msgs = ko.observableArray();
+  self.msgs = ko.mapping.fromJS([], app.MsgsMapping);
+  self.afterMsgsRender = ko.computed(function() {
+    $(window)._scrollable(); 
+  }).extend({ throttle: 100 });
   self.predefinedRooms = ko.observableArray(['b', 'rm', 'to']);
-
-  /* Websocket configuration */
-  self.ws = io.connect('http://touhouchat.tomago.ru/chat');
-  self.ws.on('set predefined rooms', self.predefinedRooms);
-  self.ws.on('chat msg', function(msg) {
-    if( self.msgs().length >= 100) {
-      self.msgs.shift();
-    }
-    self.msgs.push(msg);
-    if( self.scrollOnBottom ) {
-      self.scrollToBottom();
-    }
-    if( !msg.author ) {
-      self.playMessageSound();
-      $.titleAlert('Новое сообщение', { requireBlur: true  });//stopOnMouseMove: true });
-    }
-  });
-  self.ws.on('set msgs', function(msgs) {
-    self.msgs(msgs);
-    self.scrollToBottom();
-  });
-  self.ws.on('set clients count', self.clientsCount);
-  self.ws.on('error msg', function(error) { alert (error) });
-
-  self.changeRoom = function(room) {
-    if( self.room() === room ) {
-      return;
-    }
-    self.ws.emit('leave room', self.room());
-    self.ws.emit('join room', room);
-    self.room(room);
-  }
 
   /* Event handlers */
   self.writeMsg = function() {
     self.ws.emit('write msg', self.msgText());
+    self.clearMsg();
+  };
+  self.clearMsg = function() {
     self.msgText('');
+    $('#input-msg').trigger('autosize.resize');
+    $('#input-msg').focus();
+    return false;
   };
   self.msgTextKeyPressed = function(data, e) {
     if( e.keyCode == 13 && e.ctrlKey ) {
@@ -63,13 +67,42 @@ app.Model = function() {
     }
     return true;
   };
+  self.inputRoomKeyPressed = function(date, e) {
+    if( e.keyCode == 13 ) {
+      $('#input-msg').focus();
+    }
+    return /^\w$/.test(String.fromCharCode(e.charCode)) || e.keyCode != 0;
+  };
+  self.answerMsg = function(msg) {
+    var oldText = self.msgText();
+    if( oldText && oldText.length && !oldText.match(/\n$/) ) {
+      oldText += '\n'
+    }
+    self.msgText(oldText + '>' + msg.link() + '\n');
+    $('#input-msg').trigger('autosize.resize'); 
+    $('#input-msg').focus();
+  };
+  self.answerMsgQuoted = function(msg) {
+    var quotedText = $(msg.text()).text().replace(/^/gm, '>');
+    var oldText = self.msgText();
+    if( oldText && oldText.length && !oldText.match(/\n$/) ) {
+      oldText += '\n'
+    }
+    self.msgText(oldText + '>' + msg.link() + '\n' + quotedText + '\n');
+    $('#input-msg').trigger('autosize.resize'); 
+    $('#input-msg').focus();
+  };
+
+  /* Init controls */
+  $('#input-msg').autosize();
 
   /* Scrolling magic */
   self.scrollOnBottom = true;
   $(window).scroll($.debounce(250, false, function () {
-    scrollOnBottom = $(window).scrollTop() == $(document).height() - $(window).height();
+    self.scrollOnBottom = $(window).scrollTop() > $(document).height() - $(window).height() - 10;
   }));
   self.scrollToBottom = function() {
+    //$(window).scrollTo($('#msgs .msg').last());
     $(document).scrollTop($(document).height());
   };
 
@@ -92,22 +125,97 @@ app.Model = function() {
     }
   });
 
+  /* Init websockets */
+  self.ws = io.connect('http://touhouchat.tomago.ru/chat');
+  self.ws.on('set predefined rooms', self.predefinedRooms);
+  self.ws.on('chat msg', function(msg) {
+    if( self.msgs().length >= app.LOG_SIZE) {
+      self.msgs.shift();
+    }
+    self.msgs.push(new app.MsgModel(msg));
+    if( self.scrollOnBottom ) {
+      self.scrollToBottom();
+    }
+    if( !msg.author ) {
+      self.playMessageSound();
+      $.titleAlert('Новое сообщение', { requireBlur: true  });//stopOnMouseMove: true });
+    }
+  });
+  self.ws.on('set msgs', function(msgs) {
+    ko.mapping.fromJS(msgs, self.msgs);
+    self.scrollToBottom();
+  });
+  self.ws.on('set clients count', self.clientsCount);
+  self.ws.on('set total clients count', self.totalClientsCount);
+  self.ws.on('error msg', function(error) { alert (error) });
+
   /* Init pages routing */
   self.page = ko.observable();
-  
-  self.changePage = function(page) {
-    self.page(page);
-    location.hash = page;
-  };
- 
+  self.page.subscribe(function(newPage) {
+    location.hash = newPage;
+  });
+
+  self.room = ko.observable('');
+  self.room.subscribe(function(newRoom) {
+    self.ws.emit('leave room');
+    if( newRoom !== undefined ) {
+      self.ws.emit('join room', newRoom);
+    }
+    if( $.inArray(newRoom, self.predefinedRooms()) == -1 ) {
+      self.customRoom(newRoom);
+    } else {
+      self.customRoom('');
+    }
+    $('#input-msg').focus();
+  });
+
+  self.customRoom = ko.observable('');
+  self.afterCustomRoomChanged = ko.computed(function() {
+    var room = self.customRoom();
+    if( $.inArray(room, self.predefinedRooms()) != -1 ) {
+      self.customRoom('');
+      self.page(room);
+    }
+    $('#input-room').trigger(jQuery.Event( "input" ));
+    if( room && room.length > 0 ) {
+      self.page(room);
+    }
+  }, self).extend({ throttle: 1 });
+
+  self.post = ko.observable('');
+
+  self.clearPost = function() {
+    location.hash = location.hash.replace(/\&\d+$/, '');
+  }
+
   /* Init router */
   Sammy(function() {
-    this.get("#:room", function() {
-      self.changeRoom(this.params['room']);
+
+    this.get(/^\/?#(\w+)\&(\d+)$/, function() {
+      var room = this.params['splat'][0]
+        , post = this.params['splat'][1];
+      if( room !== self.room() ) {
+        self.room(room);
+      }
+      if( post != self.post() ) {
+        self.post(post);
+        $(window).scrollTo($('#msg-' + post), 100);
+      }
     });
+
+    this.get(/^\/?#(\w+)$/, function() {
+      var room = this.params['splat'][0];
+      if( room !== self.room() ) {
+        self.room(room);
+      }
+      self.post('');
+    });
+
+    this.get("", function() {
+      self.page('b');
+    });
+
   }).run();
-  
-  self.changePage('b');
 }
 
 $(document).ready(function() {

@@ -11,10 +11,10 @@ make_paths:
 	mkdir -p $(SITES_PATH)/logs/$(APP_NAME)
 
 stop:
-	su -l $(APP_USER) -c 'forever stop --sourceDir $(PROJECT_ROOT) app.js'
+	su -l $(APP_USER) -c 'NODE_ENV=production forever stop --sourceDir $(PROJECT_ROOT) app.js'
 
 start:
-	su -l $(APP_USER) -c 'forever start --sourceDir $(PROJECT_ROOT) app.js'
+	su -l $(APP_USER) -c 'NODE_ENV=production forever start --sourceDir $(PROJECT_ROOT) app.js'
 
 restart:
 	make stop

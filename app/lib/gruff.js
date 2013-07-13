@@ -2,7 +2,8 @@
   "use strict";
 
   var fn = {}
-    , render_order = "";
+    , render_order = ""
+    , roomHash = '';
 
   function f (str) {
     ([].slice.call(arguments, 1))
@@ -44,7 +45,33 @@
     };
   }
 
-  function gruff (str) {
+  var linkRoomPostRe = /#\w+?\&amp;\d+?/;
+  var linkRoomRe = /#\w+?[^\&amp;]/;
+  var linkPostRe = /#\w+?[^\&amp;]/;
+  function fnLINKROOMPOST (LINKROOMPOST) {
+    return function (match, $pre, $room, $post) {
+      if ( !($room || $post) ) {
+        return match;
+      } else {
+        var link = roomHash, linkStr = '';
+        if( $room ) {
+          link = linkStr = $room;
+        }
+        if( $post ) {
+          link += $post;
+          if( $room != roomHash ) {
+            linkStr += $post;
+          } else {
+            linkStr = $post;
+          }
+        }
+        return gruff.templates[LINKROOMPOST].replace("$1", $pre || "").replace(/\$2/g, link).replace(/\$3/, linkStr);
+      }
+    };
+  }
+
+  function gruff (str, room) {
+    roomHash = '#' + room;
     str = render_order
       .reduce(function (acc, key) {
         var config = fn[key]
@@ -77,14 +104,16 @@
   gruff.set_render_order = function (ord) {
     // as it is written, paragraphs need to be the last of the block elements
     // to prevent wrapping block element child lines in paragraph tags
-    ord = ord || "P LINKRAW STRONG EM";
+    ord = ord || "P Q LINKROOMPOST LINKRAW STRONG EM";
     //ord = ord || "BLOCKQUOTE CODE DL LI HR H LINK P LINKRAW ABBR CODELET STRONG EM SUB SUP";
     render_order = ord.split(" ");
   };
 
   gruff.templates = {
       EM         : '<em>$1</em>'
-    , LINKRAW    : '$1<a href="$2" title="">$2</a>'
+    , LINKROOMPOST   : '$1<a class="lnk-room-post" href="$2">$3</a>'
+    , LINKRAW    : '$1<a href="$2">$2</a>'
+    , Q          : '<q>$1</q>'
     , P          : '<p>$1</p>'
     , STRONG     : '<strong>$1</strong>'
   };
@@ -92,10 +121,12 @@
   gruff.set_render_order();
 
   gruff
+    .render("STRONG",     (/\*{(.+?)}\*/g), "STRONG")
     .render("EM",         (/%{(.+?)}%/g), "EM") // lookaheads are to keep code comments
+    .render("LINKROOMPOST",   (/(.)?(#\w+?)?(\&amp;\d+?)?(?=[\s\n\b<])/g), ["LINKROOMPOST"], fnLINKROOMPOST)
     .render("LINKRAW",    (/(.)?(http[s]?:\/\/[^\s]+?)(?=[\s\n\b<])/g), ["LINKRAW"], fnLINKRAW)
-    .render("P",          (/^([^\n].+)$/gm), "P")
-    .render("STRONG",     (/\*{(.+?)}\*/g), "STRONG");
+    .render("Q",          (/^<p>(&gt;.+)<\/p>$/gm), "Q")
+    .render("P",          (/^([^\n].*)$/gm), "P");
 
   typeof module === 'undefined'
     ? this.gruff = gruff
