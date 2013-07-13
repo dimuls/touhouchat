@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>touhouchat / v1.0.3</title>
+    <title>anonchat.pw</title>
     <link href='http://fonts.googleapis.com/css?family=Ubuntu:300&subset=latin,cyrillic-ext,latin-ext' rel='stylesheet' type='text/css'>
     <link href="/css/main.css" rel="stylesheet">
     <script src="/js/lib/prefixfree.js"></script>
@@ -9,7 +9,7 @@
   </head>
   <body>
     <ul id="ctrls">
-      <li class="ctrl hdr">touhouchat / v1.0.3</li>
+      <li class="ctrl hdr"><a href="http://anonchat.pw/">anonchat.pw</a></li>
       <li class="ctrl rooms">
         <!-- ko foreach: predefinedRooms -->
         <span class="btn" data-bind="
@@ -42,6 +42,10 @@
             <span class="key">кол-во клиентов на сайте:</span>
             <span class="val" data-bind="text: totalClientsCount"></span>
           </li>
+          <li class="row">
+            <span class="key">версия движка:</span>
+            <span class="val">1.0.4</span>
+          </li>
         </ul>
       </li>
     </ul>
@@ -51,7 +55,7 @@
       <li class="msg-outer">
         <div class="msg" data-bind="attr: { id: 'msg-' + id() }, css: { active: active() }">
           <div class="hdr">
-            <strong>@<span data-bind="text: id"></span></strong>&nbsp;|&nbsp;<span data-bind="text: dt"></span>&nbsp;|&nbsp;<button class='btn btn-small btn-light' data-bind="click: function(data) { $root.answerMsg(data); }">отв</button>&nbsp;<button class='btn btn-small btn-light' data-bind="click: function(data) { $root.answerMsgQuoted(data); }">отв цит</button>
+            <strong><a class="post-id" data-bind="attr: { href: linkLong }">&<span data-bind="text: id"></span></a></strong>&nbsp;|&nbsp;<span data-bind="text: dt"></span>&nbsp;|&nbsp;<button class='btn btn-small btn-light' data-bind="click: function(data) { $root.answerMsg(data); }">отв</button>&nbsp;<button class='btn btn-small btn-light' data-bind="click: function(data) { $root.answerMsgQuoted(data); }">отв цит</button>
             <!-- ko if: active() -->
               <button class='btn btn-small btn-light' data-bind="click: $root.clearPost">снять выдел</button>
             <!-- /ko -->

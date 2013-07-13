@@ -1,20 +1,20 @@
 html {
-  padding: 0px;
-  margin: 0px;
+  padding: 0;
+  margin: 0;
 }
 body {
   min-width: 800px;
-  margin: 0px;
-  padding: 0px 10px;
+  margin: 0;
+  padding: 0 10px;
   font-family: 'Ubuntu', sans-serif;
 }
 button, textarea, input {
   font-family: 'Ubuntu', sans-serif;
 }
 
-* {
-  padding: 0px;
-  margin: 0px;
+button, textarea, input, div, span, ul, li, p, q, a {
+  padding: 0;
+  margin: 0;
 }
 
 ul {
@@ -26,6 +26,10 @@ q {
   color: #006d37;
   font-style: italic;
   quotes: none;
+}
+
+a.post-id {
+  color: black;
 }
 
 .pull-left {
@@ -40,13 +44,13 @@ q {
   border-radius: 5px;
 }
 .btn.btn-small {
-  padding: 0px 3px 1px 3px;
+  padding: 0 3px 1px 3px;
   font-size: 12px;
 }
 .btn:hover {
   background: white;
   color: black;
-  box-shadow: 0px 0px 4px black;
+  box-shadow: 0 0 4px black;
 }
 .btn.active,
 .btn.active:hover {
@@ -65,7 +69,7 @@ q {
   padding: 5px;
 }
 .btn.btn-light:hover {
-  box-shadow: 0px 0px 4px grey;
+  box-shadow: 0 0 4px grey;
   color: black;
 }
 .btn.btn-light:active {
@@ -73,33 +77,33 @@ q {
   color: black;
 }
 .btn.btn-light.btn-small:hover {
-  box-shadow: 0px 0px 2px grey;
+  box-shadow: 0 0 2px grey;
 }
 .btn.btn-light.btn-small {
-  padding: 0px 2px 1px 2px;
+  padding: 0 2px 1px 2px;
 }
 
 #input-room {
-  width: 20px;
-  min-width: 20px;
+  width: 18px;
+  min-width: 18px;
   max-width: 100px;
-  height: 17px;
+  height: 20px;
   line-height: 20px;
-  padding: 6px 5px;
-  border: 0px solid black;
+  padding: 4.5px 5px 3.8px 5px;
+  border: 0 solid black;
   background: black;
   color: white;
   border-radius: 5px;
 }
 #input-room:hover {
-  box-shadow: 0px 0px 4px grey;
+  box-shadow: 0 0 4px grey;
   color: black;
   background: white;
 }
 #input-room:focus {
   color: black;
   background: white;
-  box-shadow: 0px 0px 4px grey;
+  box-shadow: 0 0 4px grey;
 }
 #input-room.active {
   background: lightgrey;
@@ -119,6 +123,11 @@ q {
   user-select: none;
 }
 
+#ctrls .ctrl.hdr a {
+  font-size: 24px;
+  color: black;
+  text-decoration: none;
+}
 #ctrls .ctrl.hdr,
 #ctrls .ctrl.rooms {
   text-align: center;
@@ -132,15 +141,15 @@ q {
 
 
 #ctrls .ctrl {
-  padding: 10px 0px;
+  padding: 10px 0;
   border-bottom: 1px solid black;
 }
 #ctrls .ctrl:first-child {
-  padding: 0px;
+  padding: 0;
   padding-bottom: 10px;
 }
 #ctrls .ctrl.last {
-  padding: 0px;
+  padding: 0;
   padding-top: 10px;
   border: none;
 }
@@ -172,7 +181,7 @@ q {
 }
 
 #write-ctrl li:last-child {
-  margin-bottom: 0px;
+  margin-bottom: 0;
 }
 
 #write-ctrl li.btns {
@@ -200,21 +209,21 @@ q {
 }
 #msgs .msg-outer { 
   border-bottom: 1px solid black;
-  margin: 0px;
-  padding: 5px 0px;
+  margin: 0;
+  padding: 5px 0;
 }
 #msgs .msg {
   border-radius: 5px;
-  padding: 5px 0px 5px 5px;
+  padding: 5px 0 5px 5px;
 }
 
 #msgs .msg.active {
   background: #ebf5ff;
-  box-shadow: 0px 0px 5px #ebf5ff;
+  box-shadow: 0 0 5px #ebf5ff;
 }
 
 #msgs .msg:first-child {
-  margin-top: 0px;
+  margin-top: 0;
 }
 
 #msgs .msg-outer:last-child {

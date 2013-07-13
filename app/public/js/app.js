@@ -4,7 +4,8 @@
 
 // App scope
 var app = {
-  LOG_SIZE: 100
+  LOG_SIZE: 100,
+  CHAT_WS_URL: 'http://anonchat.pw/chat'
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -126,7 +127,7 @@ app.Model = function() {
   });
 
   /* Init websockets */
-  self.ws = io.connect('http://touhouchat.tomago.ru/chat');
+  self.ws = io.connect(app.CHAT_WS_URL);
   self.ws.on('set predefined rooms', self.predefinedRooms);
   self.ws.on('chat msg', function(msg) {
     if( self.msgs().length >= app.LOG_SIZE) {

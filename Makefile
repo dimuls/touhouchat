@@ -1,12 +1,13 @@
 SITES_PATH = /sites
-APP_NAME = touhouchat.tomago.ru
+APP_NAME = anonchat.pw
 PROJECT_ROOT = $(SITES_PATH)/$(APP_NAME)
-NGINX_ROOT = /etc/nginx/
+NGINX_ROOT = /etc/nginx
 APP_SCRIPT = app.js
 APP_USER = node
 
-make_paths:
+paths:
 	mkdir -p $(SITES_PATH)/.config/sites-available/
+	mkdir -p $(SITES_PATH)/.config/sites-enabled/
 	mkdir -p $(PROJECT_ROOT)
 	mkdir -p $(SITES_PATH)/logs/$(APP_NAME)
 
