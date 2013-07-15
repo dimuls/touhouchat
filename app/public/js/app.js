@@ -153,7 +153,9 @@ app.Model = function() {
   /* Init pages routing */
   self.page = ko.observable();
   self.page.subscribe(function(newPage) {
-    location.hash = newPage;
+    if( newPage !== location.hash ) {
+      location.hash = newPage;
+    }
   });
 
   self.room = ko.observable('');
@@ -186,13 +188,13 @@ app.Model = function() {
   self.post = ko.observable('');
 
   self.clearPost = function() {
-    location.hash = location.hash.replace(/\&\d+$/, '');
+    self.page(location.hash.replace(/\&\d+$/, ''));
   }
 
   /* Init router */
   Sammy(function() {
 
-    this.get(/^\/?#(\w+)\&(\d+)$/, function() {
+    this.get(/^\/?#(\w+)&(\d+)$/, function() {
       var room = this.params['splat'][0]
         , post = this.params['splat'][1];
       if( room !== self.room() ) {
@@ -202,6 +204,7 @@ app.Model = function() {
         self.post(post);
         $(window).scrollTo($('#msg-' + post), 100);
       }
+      self.page(location.hash);
     });
 
     this.get(/^\/?#(\w+)$/, function() {
@@ -210,6 +213,7 @@ app.Model = function() {
         self.room(room);
       }
       self.post('');
+      self.page(location.hash);
     });
 
     this.get("", function() {

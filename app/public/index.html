@@ -15,7 +15,7 @@
         <span class="btn" data-bind="
           text: $data,
           click: function(data, event) {
-            if( $root.room !== $data ) $root.page(data)
+            if( $root.room() !== data ) { $root.page(data) };
           },
           css: { active: $root.room() == $data }
         "></span>
@@ -58,6 +58,7 @@
             <strong><a class="post-id" data-bind="attr: { href: linkLong }">&<span data-bind="text: id"></span></a></strong>&nbsp;|&nbsp;<span data-bind="text: dt"></span>&nbsp;|&nbsp;<button class='btn btn-small btn-light' data-bind="click: function(data) { $root.answerMsg(data); }">отв</button>&nbsp;<button class='btn btn-small btn-light' data-bind="click: function(data) { $root.answerMsgQuoted(data); }">отв цит</button>
             <!-- ko if: active() -->
               <button class='btn btn-small btn-light' data-bind="click: $root.clearPost">снять выдел</button>
+              <button class='btn btn-small btn-light' data-bind="click: function() { history.go(-1); }">назад</button>
             <!-- /ko -->
           </div>
           <div class="txt" data-bind="html: text"></div>

@@ -54,10 +54,10 @@ function leaveRoom(c) {
   var clientsCount = io.of('/chat').clients(c.chatRoom).length;
   if( clientsCount > 0 ) {
     io.of('/chat').in(c.chatRoom).emit('set clients count', clientsCount);
-    io.of('/chat').emit('set total clients count', io.of('/chat').clients().length);
   } else if( predefinedRooms[c.chatRoom] == undefined ) {
     delete msgs[c.chatRoom];
   }
+  io.of('/chat').emit('set total clients count', io.of('/chat').clients().length - 1);
   delete c.chatRoom;
 }
 
