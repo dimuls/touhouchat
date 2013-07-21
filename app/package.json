@@ -10,7 +10,7 @@
     "socket.io": "0.9.16",
     "escape-html": "1.0.0",
     "redis": "0.8.4",
-    "hiredis": "0.1.15"
+    "hiredis": "0.1.15",
     "redis-scripto": "0.1.2"
   }
 }
