@@ -33,7 +33,7 @@ deploy_app_static:
 	chmod -R 777 $(PROJECT_PATH)/public
 
 deploy_app:
-	make stop
+	-make stop
 	make deploy_app_static
 	make start
 

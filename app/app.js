@@ -15,8 +15,8 @@ var io = require('socket.io').listen(app.listen(8081));
 
 var escapeHtml = require('escape-html')
   , gruff = require('./lib/gruff')
-  , m = require('moment')
-  , io = require('socket.io').listen(8081);
+  , io = require('socket.io').listen(8081) 
+  , m = require('./model');
 
 io.configure('production', function() {
   io.enable('browser client minification');  // send minified client
@@ -32,55 +32,51 @@ io.configure('production', function() {
   ]);
 });
 
-var LOG_SIZE = 100;
-
-var predefinedRooms = {
-  b: 1, rm: 1, to: 1
-};
-
-var msgs = {
-  b: [], rm: [], to: []
-};
-
-msgs.b.cnt = 0;
-msgs.rm.cnt = 0;
-msgs.to.cnt = 0;
+m.init({
+  log_size_limit: 100,
+  rooms_count_limit: 100
+}, { b: 1 });
 
 function leaveRoom(c) {
-  if( c.chatRoom === undefined ) {
+  if( c.room === undefined ) {
     return;
   }
-  c.leave(c.chatRoom);
-  var clientsCount = io.of('/chat').clients(c.chatRoom).length;
+  c.leave(c.room.name);
+  var clientsCount = io.of('/chat').clients(c.room.name).length;
   if( clientsCount > 0 ) {
-    io.of('/chat').in(c.chatRoom).emit('set clients count', clientsCount);
-  } else if( predefinedRooms[c.chatRoom] == undefined ) {
-    delete msgs[c.chatRoom];
+    io.of('/chat').in(c.room.name).emit('set clients count', clientsCount);
+  } else {
+    c.room.clearIfCustom(function(err) {
+      if( err ) { console.error('Can\'t clear custom room') };
+    });
   }
   io.of('/chat').emit('set total clients count', io.of('/chat').clients().length - 1);
-  delete c.chatRoom;
+  delete c.room;
 }
 
 function joinRoom(c, room) {
   if( !room.match(/^\w+$/) ) {
     c.emit('error msg', 'Имя комнаты может содержать только символы алфавита');
     return;
-  } else if( c.chatRoom !== undefined ) {
+  } else if( c.room !== undefined ) {
     leaveRoom(c);
   }
   c.join(room);
-  c.chatRoom = room;
+  c.room = m.room(room);
   io.of('/chat').in(room).emit('set clients count', io.of('/chat').clients(room).length);
   io.of('/chat').emit('set total clients count', io.of('/chat').clients().length);
-  if( msgs[room] === undefined ) {
-    msgs[room] = [];
-    msgs[room].cnt = 0;
-  }
-  c.emit('set msgs',  msgs[room]);
+
+  c.room.msgs(function(err, msgs) {
+    if( err ) {
+      c.emit('error msg', 'Проблема с БД. Попробуйте обновить страницу.')
+    } else {
+      c.emit('set msgs',  msgs);
+    }
+  });
 }
 
 function writeMsg(c, text) {
-  if( c.chatRoom === undefined ) {
+  if( c.room === undefined ) {
     c.emit('error msg', 'Неизвестная комната. Попробуйте обновить страницу');
     return;
   }
@@ -91,24 +87,18 @@ function writeMsg(c, text) {
     return;
   }
 
-  text = gruff(escapeHtml(text), c.chatRoom);
+  text = gruff(escapeHtml(text), c.room.name);
 
-  var msg = {
-    id: ++msgs[c.chatRoom].cnt,
-    text: text,
-    dt: m().format('DD.MM.YYYY HH:mm:ss'),
-  };
-  if( msgs[c.chatRoom].length >= LOG_SIZE ) {
-    msgs[c.chatRoom].shift();
-  }
-
-  msgs[c.chatRoom].push(msg);
-  
-  msg.author = false;
-  c.broadcast.to(c.chatRoom).emit('chat msg', msg);
-
-  msg.author = true;
-  c.emit('chat msg', msg);
+  c.room.msg.add({ text: text }, function(err, msg) {
+    if( err ) {
+      c.emit('error msg', 'Проблемы с БД. Попробуйте отправить сообщение позже.');
+    } else {
+      msg.author = false;
+      c.broadcast.to(c.room.name).emit('chat msg', msg);
+      msg.author = true;
+      c.emit('chat msg', msg);
+    }
+  });
 }
 
 function getMsg(c, data) {
@@ -116,13 +106,17 @@ function getMsg(c, data) {
     c.emit('error msg', 'Неверные данные');
     return;
   }
-  var msgs = msgs[data.room];
-  if( msgs && msgs.cnt >= data.id ) {
-    var id = msgs.cnt == data.id ? data.id : data.id % LOG_SIZE;
-    c.emit('msg requested', { status: 'found', msg: msgs[id] });
-  } else {
-    c.emit('msg requested', { status: 'not found' });
-  }
+  m.room(data.room).msg(data.id, function(err, msg) {
+    if( err ) {
+      c.emit('error msg', 'Проблемы с БД. Попробуйте повторить операцию позже.');
+    } else {
+      if( msg ) {
+        c.emit('msg requested', { status: 'found', msg: msg });
+      } else {
+        c.emit('msg requested', { status: 'not found' });
+      }
+    }
+  });
 }
 
 io

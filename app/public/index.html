@@ -21,7 +21,7 @@
         "></span>
         <!-- /ko -->
         <input id="input-room" title="Введите название Вашей комнаты" data-bind="value: customRoom, event: { keypress: inputRoomKeyPressed },
-          css: { active: customRoom() == room() }" placeholder="" data-autosize-input='{ "space": 0 }'>
+          css: { active: customRoom() == room() }" placeholder="" data-autosize-input='{ "space": 0 }' />
       </li>
       <li class="ctrl last">
         <ul id="write-ctrl">
@@ -32,6 +32,23 @@
           </li>
         </ul>
       </li>
+  
+      <li id="settings" data-bind="visible: showSettings">
+        <ul>
+          <li>
+            <label for="rooms-list">Список комнат</label>
+            <input id="rooms-list" type="text" data-bind="arrayValue: predefinedRooms"/>
+          </li>
+        </ul>
+      </li>
+
+      <li class="other">
+        <span class="btn btn-light btn-icon icon-sound" data-bind="css: { 'icon-sound': soundEnabled(), 'icon-no-sound': !soundEnabled() }, click: toggleSound"></span>
+        <span class="btn btn-light btn-icon icon-settings" data-bind="css: { active: showSettings() }, click: toggleSettings">
+          
+        </span>
+      </li>
+
       <li class="stats">
         <ul class="rows">
           <li class="row">
@@ -44,7 +61,7 @@
           </li>
           <li class="row">
             <span class="key">версия движка:</span>
-            <span class="val">1.0.4</span>
+            <span class="val">1.0.5</span>
           </li>
         </ul>
       </li>
@@ -72,6 +89,8 @@
     <script src="/js/lib/jquery-scroll-to.js"></script>
     <script src="/js/lib/jquery-autosize-input.js"></script>
     <script src="/js/lib/jquery-autosize.js"></script>
+    <script src="/js/lib/jquery-cookie.js"></script>
+    <script src="/js/lib/jquery-caret.js"></script>
     <script src="/js/lib/soundmanager.js"></script>
     <script src="/js/lib/sammy.js"></script>
   	<script src="/js/lib/knockout.js"></script>

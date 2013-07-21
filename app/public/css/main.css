@@ -17,6 +17,12 @@ button, textarea, input, div, span, ul, li, p, q, a {
   margin: 0;
 }
 
+input {
+  border: 1px solid black;
+  padding: 5px;
+  box-sizing: border-box;
+}
+
 ul {
   list-style-type: none;
 }
@@ -37,6 +43,8 @@ a.post-id {
 }
 
 .btn {
+  display: inline-block;
+  line-height: 19px;
   border: none;
   background: black;
   color: white;
@@ -46,6 +54,7 @@ a.post-id {
 .btn.btn-small {
   padding: 0 3px 1px 3px;
   font-size: 12px;
+  line-height: 12px;
 }
 .btn:hover {
   background: white;
@@ -83,17 +92,46 @@ a.post-id {
   padding: 0 2px 1px 2px;
 }
 
+.btn.btn-icon {
+  width: 19px;
+  height: 19px;
+  background-size: 22px 22px !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-attachment: local !important;
+}
+.btn.btn-icon.active {
+  background: lightgrey;
+}
+
+doesnotexist:-o-prefocus, .btn.btn-icon {
+  border-radius: 0px;
+}
+
+.icon-settings {
+  background-image: url("/img/i/settings.svg") !important;
+}
+
+.icon-no-sound {
+  background-image: url("/img/i/no-sound.svg") !important;
+}
+.icon-sound {
+  background-image: url("/img/i/sound.svg") !important;
+}
+
+
 #input-room {
-  width: 18px;
-  min-width: 18px;
+  width: 20px;
+  min-width: 20px;
   max-width: 100px;
-  height: 20px;
-  line-height: 20px;
-  padding: 4.5px 5px 3.8px 5px;
+  height: 29px;
+  line-height: 19px;
+  padding: 5px;
   border: 0 solid black;
   background: black;
   color: white;
   border-radius: 5px;
+  font-size: 16px;
 }
 #input-room:hover {
   box-shadow: 0 0 4px grey;
@@ -154,10 +192,23 @@ a.post-id {
   border: none;
 }
 
+#ctrls .other {
+  display: block;
+  width: 300px;
+  bottom: 60px;
+  text-align: center;
+  vertical-align: text-bottom;
+  height: 35px;
+  position: fixed;
+  bottom: 47px;
+  padding-bottom: 10px;
+}
+
 #ctrls .stats {
   position: fixed;
   bottom: 10px;
   font-size: 10px;
+  line-height: 10px;
   border-top: 1px solid black;
 }
 #ctrls .stats .rows {
@@ -198,6 +249,30 @@ a.post-id {
   padding: 5px;
   border: 1px solid black;
   font-size: 12px;
+}
+
+#settings {
+  position: fixed;
+  bottom: 90px;
+  padding: 10px;
+  left: 0px;
+  width: 310px;
+  text-align: center;
+  box-sizing: border-box;
+  font-size: 14px;
+  line-height: 14px;
+}
+
+#settings ul {
+  padding: 10px;
+  border: 1px solid black;
+  text-align: left;
+}
+
+#settings #rooms-list {
+  margin-top: 5px;
+  width: 100%;
+  display: block;
 }
 
 #msgs {
