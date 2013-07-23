@@ -195,6 +195,7 @@ textarea.black-special.static:focus,
 input.black-special.static:focus {
   background: #222;
   color: lightgrey;
+  box-shadow: none !important;
 }
 
 #input-room {
