@@ -46,10 +46,11 @@ a.post-id {
   display: inline-block;
   line-height: 19px;
   border: none;
-  background: black;
-  color: white;
+  background: #222;
+  color: lightgrey;
   padding: 5px;
   border-radius: 5px;
+  cursor: pointer;
 }
 .btn.btn-small {
   padding: 0 3px 1px 3px;
@@ -66,6 +67,11 @@ a.post-id {
   background: lightgrey;
   color: black;
   box-shadow: none;
+  cursor: default;
+}
+.btn.active.btn-tgl:hover {
+  cursor: pointer;
+  box-shadow: 0 0 4px black;
 }
 .btn:active {
   background: lightgrey;
@@ -100,52 +106,62 @@ a.post-id {
   background-position: center center !important;
   background-attachment: local !important;
 }
-.btn.btn-icon.active {
-  background: lightgrey;
-}
 
 doesnotexist:-o-prefocus, .btn.btn-icon {
   border-radius: 0px;
 }
 
-.icon-settings {
-  background-image: url("/img/i/settings.svg") !important;
+.icon-settings { background-image: url("/img/i/settings-inverse.svg") !important; }
+.icon-no-sound { background-image: url("/img/i/no-sound-inverse.svg") !important; }
+.icon-sound    { background-image: url("/img/i/sound-inverse.svg")    !important; }
+.icon-help     { background-image: url("/img/i/help-inverse.svg")     !important; }
+.icon-settings:hover, .icon-settings.active { background-image: url("/img/i/settings.svg") !important; }
+.icon-no-sound:hover, .icon-no-sound.active { background-image: url("/img/i/no-sound.svg") !important; }
+.icon-sound:hover,    .icon-sound.active    { background-image: url("/img/i/sound.svg")    !important; }
+.icon-help:hover,     .icon-help.active     { background-image: url("/img/i/help.svg")     !important; }
+
+textarea.black-special,
+input.black-special {
+  height: 29px;
+  line-height: 19px;
+  padding: 5px;
+  border: 0 solid black;
+  background: #222;
+  color: lightgrey;
+  border-radius: 5px;
+  font-size: 16px;
+}
+textarea.black-special:hover,
+input.black-special:hover {
+  box-shadow: 0 0 4px grey;
+  color: black;
+  background: white;
+}
+textarea.black-special:focus,
+input.black-special:focus {
+  color: black;
+  background: white;
+  box-shadow: 0 0 4px grey;
+}
+textarea.black-special.active,
+input.black-special.active {
+  background: lightgrey;
+  color: black;
+}
+textarea.black-special.static:hover,
+input.black-special.static:hover,
+textarea.black-special.static:focus,
+input.black-special.static:focus {
+  background: #222;
+  color: lightgrey;
 }
 
-.icon-no-sound {
-  background-image: url("/img/i/no-sound.svg") !important;
-}
-.icon-sound {
-  background-image: url("/img/i/sound.svg") !important;
-}
 
 
 #input-room {
   width: 20px;
   min-width: 20px;
   max-width: 100px;
-  height: 29px;
-  line-height: 19px;
-  padding: 5px;
-  border: 0 solid black;
-  background: black;
-  color: white;
-  border-radius: 5px;
-  font-size: 16px;
-}
-#input-room:hover {
-  box-shadow: 0 0 4px grey;
-  color: black;
-  background: white;
-}
-#input-room:focus {
-  color: black;
-  background: white;
-  box-shadow: 0 0 4px grey;
-}
-#input-room.active {
-  background: lightgrey;
-  color: black;
 }
 
 #ctrls {
@@ -192,7 +208,7 @@ doesnotexist:-o-prefocus, .btn.btn-icon {
   border: none;
 }
 
-#ctrls .other {
+#ctrls .other-btns {
   display: block;
   width: 300px;
   bottom: 60px;
@@ -200,8 +216,65 @@ doesnotexist:-o-prefocus, .btn.btn-icon {
   vertical-align: text-bottom;
   height: 35px;
   position: fixed;
-  bottom: 47px;
-  padding-bottom: 10px;
+  bottom: 40px;
+  padding-bottom: 15px;
+}
+
+#ctrls .other-form .hdr {
+  font-weight: bold;
+  text-align: center;
+  padding-bottom: 5px;
+  display: block;
+}
+
+#ctrls .other-form {
+  position: fixed;
+  bottom: 92px;
+  padding: 10px;
+  left: 0px;
+  width: 308.5px;
+  text-align: center;
+  box-sizing: border-box;
+  font-size: 14px;
+  line-height: 14px;
+}
+#ctrls .other-form .close {
+  float: right;
+  display: inline-block;
+  padding-top: 8px;
+  padding-right: 10px;
+  font-size: 26px;
+  cursor: pointer;
+}
+#ctrls .other-form ul {
+  background: white;
+  border-radius: 5px;
+  border: 1px solid lightgrey;
+  box-shadow: 0 0 4px grey;
+  padding: 10px;
+  text-align: left;
+}
+
+#ctrls .other-form ul ul {
+  padding: 0 0 10px 15px;
+  border: none;
+  box-shadow: none;
+  text-align: left;
+  list-style-type: disc;
+}
+#ctrls .other-form ul ul li {
+  padding-top: 5px;
+  padding-left: 5px;
+}
+#ctrls .other-form ul ul q {
+  display: inline;
+}
+
+
+#rooms-list {
+  margin-top: 5px;
+  width: 100%;
+  display: block;
 }
 
 #ctrls .stats {
@@ -213,7 +286,7 @@ doesnotexist:-o-prefocus, .btn.btn-icon {
 }
 #ctrls .stats .rows {
   width: 300px;
-  padding-top: 10px;
+  padding-top: 8px;
 }
 #ctrls .stats .key {
   float: left;
@@ -240,40 +313,20 @@ doesnotexist:-o-prefocus, .btn.btn-icon {
 }
 
 #input-msg {
-  width: 100%;
+  width: 280px;
+  height: 100px;
   min-height: 100px;
-  max-height: 300px;
+  max-height: 200px;
   line-height: 20px;
-  box-sizing: border-box;
-  resize: none;
-  padding: 5px;
-  border: 1px solid black;
   font-size: 12px;
+  overflow: hidden;
+  resize: vertical;
 }
 
-#settings {
-  position: fixed;
-  bottom: 90px;
-  padding: 10px;
-  left: 0px;
-  width: 310px;
-  text-align: center;
-  box-sizing: border-box;
-  font-size: 14px;
-  line-height: 14px;
-}
-
-#settings ul {
-  padding: 10px;
-  border: 1px solid black;
-  text-align: left;
-}
-
-#settings #rooms-list {
-  margin-top: 5px;
-  width: 100%;
-  display: block;
-}
+#input-msg::-webkit-input-placeholder { font-style: italic; }
+#input-msg::-moz-placeholder { font-style: italic; }
+#input-msg:-ms-input-placeholder { font-style: italic; }
+#input-msg:-moz-placeholder { font-style: italic; }
 
 #msgs {
   box-sizing: border-box;
@@ -303,6 +356,7 @@ doesnotexist:-o-prefocus, .btn.btn-icon {
 
 #msgs .msg-outer:last-child {
   border-bottom: none;
+  padding-bottom: 0px;
 }
 
 #msgs .msg .txt {

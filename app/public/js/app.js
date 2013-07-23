@@ -14,7 +14,7 @@ if( !$.cookie('predefinedRooms') ) {
 // App scope
 var app = {
   LOG_SIZE: 100,
-  CHAT_WS_URL: 'http://anonchat.pw/chat',
+  CHAT_WS_URL: 'http://anonchat.pw/chat'
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -82,13 +82,25 @@ app.Model = function() {
 
   /* Settings data */
   self.predefinedRooms = ko.observable($.cookie('predefinedRooms'));
-  self.predefinedRoomsChanged = ko.computed(self.predefinedRooms).extend({ throttle: 500 });
+  self.predefinedRoomsChanged = ko.computed(self.predefinedRooms).extend({ throttle: 100 });
   self.predefinedRoomsChanged.subscribe(function(newPredefinedRooms) {
     $.cookie('predefinedRooms', newPredefinedRooms);
+    self.customRoom.valueHasMutated();
   });
   self.showSettings = ko.observable(false);
   self.toggleSettings = function() {
+    self.showHelp(false);
     self.showSettings(!self.showSettings());
+  };
+  ko.computed(function() {
+    if( self.showSettings() ) {
+      $('#rooms-list').focus().caretToEnd();
+    }
+  }).extend({ throttle: 100 });
+  self.showHelp = ko.observable(false);
+  self.toggleHelp = function() {
+    self.showSettings(false)
+    self.showHelp(!self.showHelp());
   };
 
   /* Event handlers */

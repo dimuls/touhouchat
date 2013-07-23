@@ -20,12 +20,12 @@
           css: { active: $root.room() == $data }
         "></span>
         <!-- /ko -->
-        <input id="input-room" title="Введите название Вашей комнаты" data-bind="value: customRoom, event: { keypress: inputRoomKeyPressed },
+        <input id="input-room" class="black-special" title="Введите название временной комнаты" data-bind="value: customRoom, event: { keypress: inputRoomKeyPressed },
           css: { active: customRoom() == room() }" placeholder="" data-autosize-input='{ "space": 0 }' />
       </li>
       <li class="ctrl last">
         <ul id="write-ctrl">
-          <li><textarea id="input-msg" title="Введите Ваше сообщение" data-bind="value: msgText, valueUpdate: 'afterkeydown', event: { keypress: msgTextKeyPressed }"></textarea></li>
+          <li><textarea id="input-msg" class="black-special static" placeholder="Введите Ваше сообщение" data-bind="value: msgText, valueUpdate: 'afterkeydown', event: { keypress: msgTextKeyPressed }"></textarea></li>
           <li class="btns">
             <button class="btn btn-light pull-left" title="Очистить поле ввода сообщений" data-bind="click: clearMsg">очистить</button>
             <button class="btn" title="Отправить сообщение" data-bind="click: writeMsg">написать</button>
@@ -33,20 +33,51 @@
         </ul>
       </li>
   
-      <li id="settings" data-bind="visible: showSettings">
-        <ul>
+      <li class="other-form" style="display: none" data-bind="visible: showSettings">
+        <span class="close" data-bind="click: toggleSettings">×</span>
+        <ul> 
+          <li class="hdr">Настройки</li>
           <li>
-            <label for="rooms-list">Список комнат</label>
-            <input id="rooms-list" type="text" data-bind="arrayValue: predefinedRooms"/>
+            <label for="rooms-list">Список комнат ( через запятую )</label>
+            <input id="rooms-list" class="black-special static" type="text" data-bind="arrayValue: predefinedRooms"/>
           </li>
         </ul>
       </li>
 
-      <li class="other">
-        <span class="btn btn-light btn-icon icon-sound" data-bind="css: { 'icon-sound': soundEnabled(), 'icon-no-sound': !soundEnabled() }, click: toggleSound"></span>
-        <span class="btn btn-light btn-icon icon-settings" data-bind="css: { active: showSettings() }, click: toggleSettings">
-          
-        </span>
+      <li class="other-form" style="display: none" data-bind="visible: showHelp">
+        <span class="close" data-bind="click: toggleHelp">×</span>
+        <ul>
+          <li class="hdr">Справка</li>
+          <li>
+            Разметка:
+            <ul>
+              <li>*{<strong>жирный</strong>}*</li>
+              <li>%{<em>наклонный</em>}%</li>
+              <li><q>&gt;цитата</q></li>
+            </ul>
+          </li>
+          <li>
+            Ссылки:
+            <ul>
+              <li>#&lt;<em>room</em>&gt;</li>
+              <li>&amp;&lt;<em>post</em>&gt;</li>
+              <li>#&lt;<em>room</em>&gt;&amp;&lt;<em>post</em>&gt;</li>
+            </ul>
+          </li>
+          <li>
+            Ограничения:
+            <ul>
+              <li>room - имя комнаты может состоять только из символов [A-Za-z0-9_]</li>
+              <li>post - номер поста может состоять только из цифр [0-9]</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+
+      <li class="other-btns">
+        <span class="btn btn-icon btn-tgl icon-sound" title="Вкл/выкл. звук" data-bind="css: { 'icon-sound': soundEnabled(), 'icon-no-sound': !soundEnabled() }, click: toggleSound"></span>
+        <span class="btn btn-icon btn-tgl icon-settings" title="Настройки" data-bind="css: { active: showSettings() }, click: toggleSettings"></span>
+        <span class="btn btn-icon btn-tgl icon-help" title="Справка" data-bind="css: { active: showHelp() }, click: toggleHelp"></span>
       </li>
 
       <li class="stats">
@@ -61,7 +92,7 @@
           </li>
           <li class="row">
             <span class="key">версия движка:</span>
-            <span class="val">1.0.5</span>
+            <span class="val">1.0.6</span>
           </li>
         </ul>
       </li>
