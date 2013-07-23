@@ -11,6 +11,7 @@
     <ul id="ctrls">
       <li class="ctrl hdr"><a href="http://anonchat.pw/">anonchat.pw</a></li>
       <li class="ctrl rooms">
+        <div class="top-side-shadow "><div></div></div>
         <!-- ko foreach: predefinedRooms -->
         <span class="btn" data-bind="
           text: $data,
@@ -22,10 +23,11 @@
         <!-- /ko -->
         <input id="input-room" class="black-special" title="Введите название временной комнаты" data-bind="value: customRoom, event: { keypress: inputRoomKeyPressed },
           css: { active: customRoom() == room() }" placeholder="" data-autosize-input='{ "space": 0 }' />
+        <div class="bottom-side-shadow "><div></div></div>
       </li>
       <li class="ctrl last">
         <ul id="write-ctrl">
-          <li><textarea id="input-msg" class="black-special static" placeholder="Введите Ваше сообщение" data-bind="value: msgText, valueUpdate: 'afterkeydown', event: { keypress: msgTextKeyPressed }"></textarea></li>
+          <li><textarea id="input-msg" class="black-special static" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Введите Ваше сообщение'" data-bind="value: msgText, valueUpdate: 'afterkeydown', event: { keypress: msgTextKeyPressed }"></textarea></li>
           <li class="btns">
             <button class="btn btn-light pull-left" title="Очистить поле ввода сообщений" data-bind="click: clearMsg">очистить</button>
             <button class="btn" title="Отправить сообщение" data-bind="click: writeMsg">написать</button>
@@ -48,6 +50,13 @@
         <span class="close" data-bind="click: toggleHelp">×</span>
         <ul>
           <li class="hdr">Справка</li>
+          <li>
+            Быстрые клавиши:
+            <ul>
+              <li>Ctrl+Enter - написать при вводе сообщения</li>
+            </ul>
+          </li>
+
           <li>
             Разметка:
             <ul>
@@ -74,21 +83,23 @@
         </ul>
       </li>
 
-      <li class="other-btns">
+      <li class="other-btns ctrl">
+        <div class="top-side-shadow "><div></div></div>
         <span class="btn btn-icon btn-tgl icon-sound" title="Вкл/выкл. звук" data-bind="css: { 'icon-sound': soundEnabled(), 'icon-no-sound': !soundEnabled() }, click: toggleSound"></span>
         <span class="btn btn-icon btn-tgl icon-settings" title="Настройки" data-bind="css: { active: showSettings() }, click: toggleSettings"></span>
         <span class="btn btn-icon btn-tgl icon-help" title="Справка" data-bind="css: { active: showHelp() }, click: toggleHelp"></span>
+        <div class="bottom-side-shadow "><div></div></div>
       </li>
 
       <li class="stats">
         <ul class="rows">
           <li class="row">
             <span class="key">кол-во клиентов в комнате:</span>
-            <span class="val" data-bind="text: clientsCount"></span>
+            <span class="val" data-bind="text: clientsCount">&nbsp;</span>
           </li>
           <li class="row">
             <span class="key">кол-во клиентов на сайте:</span>
-            <span class="val" data-bind="text: totalClientsCount"></span>
+            <span class="val" data-bind="text: totalClientsCount">&nbsp;</span>
           </li>
           <li class="row">
             <span class="key">версия движка:</span>

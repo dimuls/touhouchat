@@ -1,3 +1,5 @@
+$(document).ready(function() {
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 *   External modules initialization
 */
@@ -86,6 +88,7 @@ app.Model = function() {
   self.predefinedRoomsChanged.subscribe(function(newPredefinedRooms) {
     $.cookie('predefinedRooms', newPredefinedRooms);
     self.customRoom.valueHasMutated();
+    self.page.valueHasMutated();
   });
   self.showSettings = ko.observable(false);
   self.toggleSettings = function() {
@@ -277,4 +280,6 @@ app.Model = function() {
 $(document).ready(function() {
   app.model = new app.Model();
   ko.applyBindings(app.model);
+});
+
 });
