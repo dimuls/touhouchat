@@ -8,3 +8,5 @@ Realtime anonymous chat engine based on node.js and socket.io
 
 ### Planned:
 - Danbooru like image store for image posting
+
+You can check it in http://anonchat.pw
