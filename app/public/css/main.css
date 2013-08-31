@@ -98,6 +98,7 @@ a.post-id {
   font-size: 12px;
   line-height: 12px;
 }
+.btn:focus,
 .btn:hover {
   background: white;
   color: black;
@@ -163,8 +164,8 @@ doesnotexist:-o-prefocus, .btn.btn-icon {
 
 textarea.black-special,
 input.black-special {
-  height: 29px;
-  line-height: 19px;
+  min-height: 30px;
+  line-height: 20px;
   padding: 5px;
   border: 0 solid black;
   background: #222;
@@ -239,7 +240,7 @@ input.black-special.static:focus {
   overflow: hidden;
   line-height: 200%;
 }
-#ctrls .ctrl.rooms span {
+#ctrls .ctrl.rooms button {
   display: inline-block;
   text-decoration: none;
 }
@@ -322,8 +323,13 @@ input.black-special.static:focus {
   display: inline;
 }
 
-
-#rooms-list {
+#ctrls .other-form.settings ul li {
+  margin-bottom: 10px;
+}
+#ctrls .other-form.settings ul li:last-child {
+  margin-bottom: 0px;
+}
+#ctrls .other-form.settings ul li input {
   margin-top: 5px;
   width: 100%;
   display: block;
@@ -367,7 +373,7 @@ input.black-special.static:focus {
   width: 290px;
 }
 
-#input-msg {
+#msg-text {
   width: 270px;
   height: 100px;
   min-height: 100px;
@@ -379,10 +385,21 @@ input.black-special.static:focus {
   resize: vertical;
 }
 
-#input-msg::-webkit-input-placeholder { font-style: italic; }
-#input-msg::-moz-placeholder { font-style: italic; }
-#input-msg:-ms-input-placeholder { font-style: italic; }
-#input-msg:-moz-placeholder { font-style: italic; }
+#msg-text::-webkit-input-placeholder { font-style: italic; }
+#msg-text::-moz-placeholder { font-style: italic; }
+#msg-text:-ms-input-placeholder { font-style: italic; }
+#msg-text:-moz-placeholder { font-style: italic; }
+#msg-image-preview {
+  max-width: 290px;
+  max-height: 100px;
+}
+#msg-image-btn { width: 290px; }
+#msg-image-input {
+  position: fixed;
+  visibility: hidden
+  left: -1000px;
+  right: -1000px;
+}
 
 #msgs {
   box-sizing: border-box;
@@ -416,9 +433,22 @@ input.black-special.static:focus {
   padding-bottom: 0px;
 }
 
+#msgs .msg .img {
+  float: left;
+  margin-right: 5px;
+}
+
+#msgs .msg img {
+  max-height: 100px;
+  max-width: 100px;
+}
+
 #msgs .msg .txt {
+  display: block;
   max-height: 200px;
   overflow: auto;
+  vertical-align: top;
+  line-height: 21px;
 }
 
 #msgs .msg .hdr {

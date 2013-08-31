@@ -1,6 +1,6 @@
 {
   "name": "touhouchat",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "private": true,
   "scripts": {
     "start": "node app.js"
@@ -11,6 +11,10 @@
     "escape-html": "1.0.0",
     "redis": "0.8.4",
     "hiredis": "0.1.15",
-    "redis-scripto": "0.1.2"
+    "redis-scripto": "0.1.2",
+    "gm": "1.11.0",
+    "express": "3.3.5",
+    "ejs": "*",
+    "stylus": "*"
   }
 }

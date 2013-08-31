@@ -11,6 +11,9 @@ paths:
 	mkdir -p $(SITES_PATH)/.config/sites-enabled/
 	mkdir -p $(PROJECT_PATH)
 	mkdir -p $(SITES_PATH)/logs/$(APP_NAME)
+	mkdir -p $(SITES_PATH)/upload/$(APP_NAME)
+	chown -R node:www-data $(SITES_PATH)/upload/$(APP_NAME)
+	chown 777 $(SITES_PATH)/upload/$(APP_NAME)
 
 stop:
 	su -l $(APP_USER) -c 'NODE_ENV=production forever stop --sourceDir $(PROJECT_PATH) app.js'

@@ -1,7 +1,8 @@
 var moment = require('moment')
   , fs = require('fs')
-  , Scripto = require('redis-scripto');
-
+  , Scripto = require('redis-scripto')
+  , crypto = require('crypto')
+  , uuid = require('node-uuid');
 
 var c = require('redis').createClient()
   , clua = new Scripto(c);
@@ -22,6 +23,63 @@ exports.init = function(config, predefinedRooms) {
       }
     });
 };
+
+exports.user = {
+  create: function(cb) {
+    crypto.randomBytes(64, function(err, buf) {
+      if( err ) { cb(err); return; }
+      var uid = buf.toString('hex');
+      clua.run('userCreate', [], [uid], function(err) {
+        if( err ) { cb(err); return; }
+        cb(null, uid);
+      });
+    });
+  },
+  login: function(uid, cb) {
+    clua.run('userLogin', [], [uid], cb)
+  },
+  logout: function(uid, cb) {
+    clua.run('userLogout', [], [uid], cb);
+  },
+  remove: function(uid, cb) {
+    c.del('users/'+uid, cb)
+  }
+}
+
+exports.extension = {
+  create: function(cb) {
+    crypto.randomBytes(128, function(err, buf) {
+      if( err ) { cb(err); return; }
+      var code = buf.toString('hex');
+      c.hset('extensions', code, '', function(err) {
+        cb(err, err ? undefined : code);
+      });
+    });
+  },
+  check: function(uid, code, cb) {
+    c.hget('extensions', code, function(err, ownerUid) {
+      if( err ) { cb(err); return }
+      ownerUid === uid
+        ? cb(null, true)
+        : cb(null, false, 'Extension code used by user '+uid+' activate by another user');
+    });
+  },
+  activate: function(uid, code, cb) {
+    clua.run('extensionActivate', [], [uid, code], function(err, res) {
+      cb(err, res[0], res[1]);
+    });
+  },
+  remove: function(code, cb) {
+    c.hdel('extensions', code, cb);
+  }
+}
+
+exports.rateLimit = {
+  check: function(cfg, ip, cb) {
+    var now = (new Date()).getTime();
+    clua.run('rateLimit', ['rl/'+cfg.path+'/'+ip], [cfg.time, cfg.count, now], cb);
+  }
+}
 
 exports.rooms = {
   count: function(cb) {
@@ -51,13 +109,15 @@ exports.room = function(room) {
       return m;
     },
     clearIfCustom: function(cb) {
-      m.clua.run('clearIfCustom', [room], cb);
+      m.clua.run('roomClearIfCustom', [room], cb);
+      return m;
     },
     msg: function(id, cb) {
-      m.clua.run('getMsg', [room], [id], function(err, msg) {
+      m.clua.run('messageGet', [room], [id], function(err, msg) {
         if( err ) { cb(err); return; }
         cb(null, JSON.parse(msg));
       });
+      return m;
     }
   };
 
@@ -71,11 +131,12 @@ exports.room = function(room) {
 
   m.msg.add = function(msg, cb) {
     msg.dt = moment().format('DD.MM.YYYY HH:mm:ss');
-    m.clua.run('addMsg', [room], [JSON.stringify(msg)], function(err, id) {
+    m.clua.run('messageAdd', [room], [JSON.stringify(msg)], function(err, id) {
       if( err ) { cb(err); return }
       msg.id = id;
       cb(null, msg);
     });
+    return m;
   };
 
   return m;

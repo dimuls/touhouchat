@@ -34,44 +34,31 @@
       // de-tokenize newlines for readability
       : str.replace(rNT, NLs);
   }
-/*
-  function fnLINKRAW (LINKRAW) {
-    return function (match, $1, $2, $3) {
-      if ($1 === '"' && $2.slice(-1) === '"') {
-        return match;
-      } else {
-        return gruff.templates[LINKRAW].replace("$1", $1 || "").replace(/\$2/g, $2);
-      }
-    };
-  }
-*/
-  var linkRoomPostRe = /#\w+?\&amp;\d+?/;
-  var linkRoomRe = /#\w+?[^\&amp;]/;
-  var linkPostRe = /#\w+?[^\&amp;]/;
-  function fnLINKRAW (LINKROOMPOST) {
+
+  function fnLINK () {
     return function (match, $pre, _, $httpLink, $room, $post) {
       if ( !( $httpLink || $room || $post) ) {
         return match;
       } else {
         if($httpLink) {
-          return gruff.templates['LINKRAW']
+          return gruff.templates['LINK']
             .replace("$1", $pre || "")
             .replace(/\$2/g, $httpLink.replace('&amp;', '&'))
             .replace(/\$3/g, $httpLink);
         } else {
-          var link = roomHash, linkStr = '';
+          var link = roomHash, linkStr = '/';
           if( $room ) {
-            link = linkStr = $room;
+            link = linkStr = $room + '/';
           }
           if( $post ) {
             link += $post;
             if( $room != roomHash ) {
               linkStr += $post;
             } else {
-              linkStr = $post;
+              linkStr = '/' + $post;
             }
           }
-          return gruff.templates[LINKROOMPOST]
+          return gruff.templates['LINKROOMPOST']
             .replace("$1", $pre || "")
             .replace(/\$2/g, link.replace('&amp;', '&'))
             .replace(/\$3/, linkStr);
@@ -81,7 +68,7 @@
   }
 
   function gruff (str, room) {
-    roomHash = '#' + room;
+    roomHash = '/' + room + '/';
     str = render_order
       .reduce(function (acc, key) {
         var config = fn[key]
@@ -114,15 +101,15 @@
   gruff.set_render_order = function (ord) {
     // as it is written, paragraphs need to be the last of the block elements
     // to prevent wrapping block element child lines in paragraph tags
-    ord = ord || "P Q LINKRAW STRONG EM";
+    ord = ord || "P Q LINK STRONG EM";
     //ord = ord || "BLOCKQUOTE CODE DL LI HR H LINK P LINKRAW ABBR CODELET STRONG EM SUB SUP";
     render_order = ord.split(" ");
   };
 
   gruff.templates = {
       EM         : '<em>$1</em>'
-    , LINKROOMPOST   : '$1<a class="lnk-room-post" href="$2">$3</a>'
-    , LINKRAW    : '$1<a href="$2">$3</a>'
+    , LINKROOMPOST   : '$1<a href="$2">$3</a>'
+    , LINK       : '$1<a href="$2" target="_blank">$3</a>'
     , Q          : '<q>$1</q>'
     , P          : '<p>$1</p>'
     , STRONG     : '<strong>$1</strong>'
@@ -132,9 +119,8 @@
 
   gruff
     .render("STRONG",     (/\*{(.+?)}\*/g), "STRONG")
-    .render("EM",         (/%{(.+?)}%/g), "EM") // lookaheads are to keep code comments
-    //.render("LINKROOMPOST",   (/(.)?(?=[\s\n\b<])/g), ["LINKROOMPOST"], fnLINKROOMPOST)
-    .render("LINKRAW",    (/(.)?((http[s]?:\/\/[^\s]+?)|(#\w+?)?(\&amp;\d+?)?)(?=[\s\n\b<])/g), ["LINKRAW"], fnLINKRAW)
+    .render("EM",         (/%{(.+?)}%/g), "EM")
+    .render("LINK",       (/(.)?((http[s]?:\/\/[^\s]+?)|(\/\w*[A-Za-z_]\w*)?\/(\d+\/)?)(?=[\s\n\b<])/g), ["LINK"], fnLINK)
     .render("Q",          (/^<p>(&gt;.+)<\/p>$/gm), "Q")
     .render("P",          (/^([^\n].*)$/gm), "P");
 
