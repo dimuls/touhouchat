@@ -12,9 +12,12 @@ clua.loadFromDir(__dirname + '/lua-scripts/');
 exports.c = c;
 exports.clua = clua;
 
-exports.init = function(config, predefinedRooms) {
+var config;
+
+exports.init = function(_config, predefinedRooms) {
+  config = _config;
   c.multi()
-    .hmset('config', config)
+    .hmset('config', _config)
     .hmset('predefined_rooms', predefinedRooms)
     .exec(function(err) {
       if( err ) {
@@ -97,7 +100,7 @@ exports.room = function(room) {
     msgs: function(cb) {
       m.c.lrange(hroom, 0, -1, function(err, msgs) {
         if( err ) { cb(err); return; }
-        cb(null, msgs ? msgs.map(JSON.parse) : []);
+        cb(null, msgs ? msgs.filter(function(msg) { return msg.length > 0 }).map(JSON.parse) : []);
       });
       return m;
     },
@@ -121,7 +124,7 @@ exports.room = function(room) {
     }
   };
 
-  m.msgs.counter = function(cb) {
+  m.msgs.count = function(cb) {
     m.c.hget('rooms_counters', room, function(err, cnt) {
       if( err ) { cb(err); return; }
       cb(null, cnt || 0);
@@ -136,6 +139,11 @@ exports.room = function(room) {
       msg.id = id;
       cb(null, msg);
     });
+    return m;
+  };
+
+  m.msg.del = function(id, cb) {
+    m.clua.run('messageDel', [room], [id], cb);
     return m;
   };
 

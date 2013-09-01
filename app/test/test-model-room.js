@@ -25,11 +25,11 @@ m.init({
 
 r = m.room('test');
 
-exports['msgs counter with empty room'] = function(t) {
+exports['msgs count with empty room'] = function(t) {
   t.expect(2);
-  r.msgs.counter(function(err, cnt) {
+  r.msgs.count(function(err, cnt) {
     t.equal(err, null, 'no error');
-    t.equal(cnt, 0, 'msgs counter is 0');
+    t.equal(cnt, 0, 'msgs count is 0');
     t.done();
   });
 };
@@ -91,9 +91,9 @@ exports['add multiple msgs to room'] = function(t) {
   r.msg.add(f.msgForFirstAdd, function(err, msg) {
     t.equal(err, null, 'no error on add 4th msg');
 
-  r.msgs.counter(function(err, cnt) {
+  r.msgs.count(function(err, cnt) {
     t.equal(err, null, 'no error');
-    t.equal(cnt, 4, 'msgs counter is 4');
+    t.equal(cnt, 4, 'msgs count is 4');
 
   r.c.llen(r.hname, function(err, len) {
     t.equal(err, null, 'no error');

@@ -9,7 +9,7 @@ if cnt and id <= cnt and id > cnt - ls_limit then
   else
     i = id  - (cnt - ls_limit + 1)
   end
-  return redis.call("lindex", "#" .. KEYS[1], i)
-else 
-  return ''
+  local msg = redis.call("lindex", "#" .. KEYS[1], i)
+  redis.call("lset", "#" .. room, i, '')
+  return msg
 end 

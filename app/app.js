@@ -18,7 +18,8 @@ var escapeHtml = require('escape-html')
   , gm = require('gm')
   , m = require('./model')
   , gruff = require('./lib/gruff')
-  , b32k = require('./lib/base32k');
+  , b32k = require('./lib/base32k')
+  , cfg = require('./config');
 
 io.configure('production', function() {
   io.enable('browser client minification');  // send minified client
@@ -33,25 +34,6 @@ io.configure('production', function() {
     , 'jsonp-polling'
   ]);
 });
-
-var cfg = {
-  model: {
-    log_size_limit: 100,
-    rooms_count_limit: 100,
-  },
-  predefinedRooms: {
-    b: 1
-  },
-  rateLimit: {
-         writeMessage: { time: 10, count: 5, path: 'message/write' },
-    activateExtension: { time: 60, count: 3, path: 'extension/activate' },
-           userCreate: { time: 60, count: 2, path: 'user/create' },
-            userLogin: { time: 60, count: 5, path: 'user/login' }
-  },
-  paths: {
-    messageImages: __dirname + '/public/img/msg'
-  }
-}
 
 m.init(cfg.model, cfg.predefinedRooms);
 
@@ -85,14 +67,13 @@ function extensionActivate(c, code) {
 }
 
 function extensionCheck(c, code) {
-  m.extension.check(c.uid, code, function(err) {
-    c.emit('check extension', err);
+  m.extension.check(c.uid, code, function(err, ok, warn) {
     if( err ) { c.emit('error message', 'Проблема с БД. Попробуйте повторить операцию позже.'); return; }
     if( ok ) {
       c.imageEnabled = true;
-      c.emit('extension activate');
+      c.emit('extension check');
     } else {
-      c.emit('extension activate', 'Не верный код расширения.');
+      c.emit('extension check', 'Не верный код расширения.');
     }
   });
 }
@@ -256,7 +237,7 @@ io
       m.rateLimit.check(cfg.rateLimit.activateExtension, c.ip, function(err, limitExceed) {
         if( err ) { c.emit('error message', 'Проблема с БД. Попробуйте повторить операцию позже.'); return; }
         if( limitExceed ) { c.emit('error message', 'Слишком частая проверка кода расширения. Подождите 1 минуту.'); return; }
-        checkExt(c, code);
+        extensionCheck(c, code);
       });
     });
 

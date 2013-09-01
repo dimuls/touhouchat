@@ -190,7 +190,7 @@ app.Model = function() {
   self.extCode = ko.observable();
   self.extCodeChanged = ko.computed(self.extCode).extend({ throttle: 100 });
   self.extCodeChanged.subscribe(function(extCode) {
-    if( extCode.length ) {
+    if( extCode !== s.extCode ) {
       self.ws.emit('extension activate', extCode);
     }
   });
@@ -396,13 +396,24 @@ app.Model = function() {
     s.extCode = self.extCode();
     $.cookie('session', s);
   });
+  self.ws.on('extension check', function(err) {
+    if( err ) {
+      alert(err);
+      s.extCode = '';
+      $.cookie('session', s);
+      return;
+    }
+    self.msgImageEnabled(true);
+    self.extCode(s.extCode);
+    $.cookie('session', s);
+  });
   self.ws.on('error message', function(error) { alert (error) });
   self.ws.on('set uid', function(uid) {
     if( !uid || !uid.length ) { alert('Не удалось установить соединение. Попробуйте обновить страницу. Если ошибка повторяется, обратитесь к разработчику.') }
     s.uid = uid;
     $.cookie('session', s);
     if( s.extCode ) {
-      app.model.extCode(s.extCode);
+      self.ws.emit('extension check', s.extCode);
     }
   });
   self.ws.on('no uid error', function(req) {
