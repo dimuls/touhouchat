@@ -1,8 +1,7 @@
 var moment = require('moment')
   , fs = require('fs')
   , Scripto = require('redis-scripto')
-  , crypto = require('crypto')
-  , uuid = require('node-uuid');
+  , crypto = require('crypto');
 
 var c = require('redis').createClient()
   , clua = new Scripto(c);

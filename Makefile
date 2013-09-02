@@ -11,9 +11,7 @@ paths:
 	mkdir -p $(SITES_PATH)/.config/sites-enabled/
 	mkdir -p $(PROJECT_PATH)
 	mkdir -p $(SITES_PATH)/logs/$(APP_NAME)
-	mkdir -p $(SITES_PATH)/upload/$(APP_NAME)
-	chown -R node:www-data $(SITES_PATH)/upload/$(APP_NAME)
-	chown 777 $(SITES_PATH)/upload/$(APP_NAME)
+	mkdir -p $(PROJECT_PATH)/upload/img/
 
 stop:
 	su -l $(APP_USER) -c 'NODE_ENV=production forever stop --sourceDir $(PROJECT_PATH) app.js'
@@ -30,10 +28,14 @@ deploy_nginx:
 	service nginx restart
 
 deploy_app_static:
-	rm -rf $(PROJECT_PATH)
-	cp -R ./app $(PROJECT_PATH)
+	rm -rf $(PROJECT_PATH)/node_modules $(PROJECT_PATH)/lib $(PROJECT_PATH)/model $(PROJECT_PATH)/public $(PROJECT_PATH)/app.js $(PROJECT_PATH)/config.js
+	cp -R ./app/node_modules $(PROJECT_PATH)
+	cp -R ./app/lib $(PROJECT_PATH)
+	cp -R ./app/model $(PROJECT_PATH)
+	cp -R ./app/public $(PROJECT_PATH)
+	cp ./app/app.js $(PROJECT_PATH)
+	cp ./app/config.js $(PROJECT_PATH)
 	chown -R node:www-data $(PROJECT_PATH)
-	chmod -R 777 $(PROJECT_PATH)/public
 
 deploy_app:
 	-make stop

@@ -13,6 +13,6 @@ module.exports = {
             userLogin: { time: 60, count: 5, path: 'user/login' }
   },
   paths: {
-    messageImages: '/sites/anonchat.pw/public/img/msg'
+    messageImages: '/sites/anonchat.pw/upload/img/'
   }
 };

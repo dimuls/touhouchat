@@ -29,7 +29,7 @@
           <li>
             <!-- ko if: msgImageEnabled -->
               <button id="msg-image-btn" class="btn" data-bind="click: addOrRemoveMsgImage, text: addOrRemoveMsgImageText">добавить картинку</button>
-              <input tabindex="-1" accept="image/png,image/jpeg,image/gif" id="msg-image-input" type="file" data-bind="file: msgImageFile, fileObjectURL: msgImageObjectURL, fileBinaryData: msgImageBinary"/>
+              <input tabindex="-1" accept="image/*" id="msg-image-input" type="file" data-bind="file: msgImageFile, fileObjectURL: msgImageObjectURL, fileBinaryData: msgImageBinary"/>
             <!-- /ko -->
           </li>
           <li class="btns">

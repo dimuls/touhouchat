@@ -35,6 +35,10 @@ io.configure('production', function() {
   ]);
 });
 
+process.on('uncaughtException', function (err) {
+  console.error(err.stack);
+});
+
 m.init(cfg.model, cfg.predefinedRooms);
 
 function processImage(image, cb) {
