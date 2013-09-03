@@ -52,15 +52,16 @@
           }
           if( $post ) {
             link += $post;
-            if( $room != roomHash ) {
-              linkStr += $post;
-            } else {
+	    console.log(roomHash);
+            if( roomHash == '#/'+$room+'/' ) {
               linkStr = '/' + $post;
+            } else {
+              linkStr += $post;
             }
           }
           return gruff.templates['LINKROOMPOST']
             .replace("$1", $pre || "")
-            .replace(/\$2/g, link.replace('&amp;', '&'))
+            .replace(/\$2/g, '/'+link.replace('&amp;', '&'))
             .replace(/\$3/, linkStr);
         }
       }
@@ -68,7 +69,7 @@
   }
 
   function gruff (str, room) {
-    roomHash = '/' + room + '/';
+    roomHash = '#/' + room + '/';
     str = render_order
       .reduce(function (acc, key) {
         var config = fn[key]
@@ -120,7 +121,7 @@
   gruff
     .render("STRONG",     (/\*{(.+?)}\*/g), "STRONG")
     .render("EM",         (/%{(.+?)}%/g), "EM")
-    .render("LINK",       (/(.)?((http[s]?:\/\/[^\s]+?)|(\/\w*[A-Za-z_]\w*)?\/(\d+\/)?)(?=[\s\n\b<])/g), ["LINK"], fnLINK)
+    .render("LINK",       (/(.)?((http[s]?:\/\/[^\s]+?)|(\/#\/\w*[A-Za-z_]\w*)?\/(\d+\/)?)(?=[\s\n\b<])/g), ["LINK"], fnLINK)
     .render("Q",          (/^<p>(&gt;.+)<\/p>$/gm), "Q")
     .render("P",          (/^([^\n].*)$/gm), "P");
 

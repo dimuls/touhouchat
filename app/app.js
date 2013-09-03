@@ -102,7 +102,7 @@ function leaveRoom(c) {
 
 function joinRoom(c, room) {
   if( !room.match(/^\w+$/) ) {
-    c.emit('error message', 'Имя комнаты может содержать только символы алфавита');
+    c.emit('error message', 'Имя комнаты может содержать только символы алфавита.');
     return;
   } else if( c.room !== undefined ) {
     leaveRoom(c);
@@ -144,25 +144,27 @@ function newMsg(c, msg) {
 
 function writeMsg(c, msg) {
   if( c.room === undefined ) {
-    c.emit('error message', 'Неизвестная комната. Попробуйте обновить страницу');
+    c.emit('room rejoin');
     return;
   }
 
   msg.text.replace(/(^\s+|\s+$)/, '');
-  if( msg.text.length < 1 || msg.text.length > 5000 ) {
-    c.emit('error message', 'Сообщение может содержать от 1 до 5000 символов');
-    return;
-  }
 
   var text = gruff(escapeHtml(msg.text), c.room.name);
   var image;
   if( msg.image ) {
     if( !c.imageEnabled ) {
-      c.emit('error message', 'Вы не можете прикреплять изображения');
+      c.emit('error message', 'Вы не можете прикреплять изображения.');
       return;
     }
     image = new Buffer(new Uint8Array(b32k.decode(msg.image)));
   }
+
+  if( ( !image && msg.text.length < 1) || msg.text.length > 5000 ) {
+    c.emit('error message', 'Сообщение может содержать от 1 до 5000 символов без картинки и до 5000 символов с картинкой.');
+    return;
+  }
+
 
   var msg = { text: text };
 

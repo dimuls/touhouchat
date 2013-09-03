@@ -53,10 +53,10 @@ app.MsgModel = function(msg) {
   ko.mapping.fromJS(msg, {}, this);
   var self = this;
   self.link = ko.computed(function() {
-    return '/' + self.id();
+    return '/' + self.id() + '/';
   }, self);
   self.linkLong = ko.computed(function() {
-    return '#' + app.model.room() + '/' + self.id();
+    return '/#/' + app.model.room() + '/' + self.id() + '/';
   }, self);
   self.active = ko.computed(function() {
     return app.model.post() == self.id();
@@ -425,6 +425,12 @@ app.Model = function() {
         alert('Не удалось установить соединение. Попробуйте обновить страницу. Если ошибка повторяется, обратитесь к разработчику.');
       }
     }, 100);
+  });
+  self.ws.on('room rejoin', function() {
+    var room = self.room();
+    if( room ) {
+     self.ws.emit('room join', room);
+    }
   });
   self.ws.on('connect', function() {
     if( s.uid && s.uid.length > 0 ) {

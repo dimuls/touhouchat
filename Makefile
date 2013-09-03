@@ -28,17 +28,19 @@ deploy_nginx:
 	service nginx restart
 
 deploy_app_static:
-	rm -rf $(PROJECT_PATH)/node_modules $(PROJECT_PATH)/lib $(PROJECT_PATH)/model $(PROJECT_PATH)/public $(PROJECT_PATH)/app.js $(PROJECT_PATH)/config.js
+	rm -rf $(PROJECT_PATH)/public
+	cp -R ./app/public $(PROJECT_PATH)
+	chown -R node:www-data $(PROJECT_PATH)
+
+deploy_app:
+	-make stop
+	rm -rf $(PROJECT_PATH)/node_modules $(PROJECT_PATH)/lib $(PROJECT_PATH)/model $(PROJECT_PATH)/app.js $(PROJECT_PATH)/config.js
 	cp -R ./app/node_modules $(PROJECT_PATH)
 	cp -R ./app/lib $(PROJECT_PATH)
 	cp -R ./app/model $(PROJECT_PATH)
 	cp -R ./app/public $(PROJECT_PATH)
 	cp ./app/app.js $(PROJECT_PATH)
 	cp ./app/config.js $(PROJECT_PATH)
-	chown -R node:www-data $(PROJECT_PATH)
-
-deploy_app:
-	-make stop
 	make deploy_app_static
 	make start
 
