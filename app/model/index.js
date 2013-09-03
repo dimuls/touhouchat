@@ -117,7 +117,7 @@ exports.room = function(room) {
     msg: function(id, cb) {
       m.clua.run('messageGet', [room], [id], function(err, msg) {
         if( err ) { cb(err); return; }
-        cb(null, JSON.parse(msg));
+        cb(null, msg ? JSON.parse(msg) : null);
       });
       return m;
     }

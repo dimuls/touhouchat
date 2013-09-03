@@ -52,8 +52,7 @@
           }
           if( $post ) {
             link += $post;
-	    console.log(roomHash);
-            if( roomHash == '#/'+$room+'/' ) {
+            if( roomHash === $room+'/' ) {
               linkStr = '/' + $post;
             } else {
               linkStr += $post;
@@ -121,7 +120,7 @@
   gruff
     .render("STRONG",     (/\*{(.+?)}\*/g), "STRONG")
     .render("EM",         (/%{(.+?)}%/g), "EM")
-    .render("LINK",       (/(.)?((http[s]?:\/\/[^\s]+?)|(\/#\/\w*[A-Za-z_]\w*)?\/(\d+\/)?)(?=[\s\n\b<])/g), ["LINK"], fnLINK)
+    .render("LINK",       (/(.)?((http[s]?:\/\/[^\s]+?)|(#\/\w*[A-Za-z_]\w*)?\/(\d+\/)?)(?=[\s\n\b<])/g), ["LINK"], fnLINK)
     .render("Q",          (/^<p>(&gt;.+)<\/p>$/gm), "Q")
     .render("P",          (/^([^\n].*)$/gm), "P");
 
