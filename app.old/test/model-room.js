@@ -19,13 +19,9 @@ function clear(exit) {
 clear();
 
 m.init({
-  model: {
-    rooms_count_limit: 2,
-    log_size_limit: 3,
-    token_expire_time: 5, // seconds
-  },
-  predefinedRooms: { test: 1 }
-});
+  rooms_count_limit: 2,
+  log_size_limit: 3
+}, { test: 1 });
 
 r = m.room('test');
 

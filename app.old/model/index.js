@@ -11,14 +11,13 @@ clua.loadFromDir(__dirname + '/lua-scripts/');
 exports.c = c;
 exports.clua = clua;
 
-var config, lib;
+var config;
 
-exports.init = function(cfg, l) {
-  config = cfg.model;
-  lib = l;
+exports.init = function(_config, predefinedRooms) {
+  config = _config;
   c.multi()
-    .hmset('config', config)
-    .hmset('predefined_rooms', cfg.predefinedRooms)
+    .hmset('config', _config)
+    .hmset('predefined_rooms', predefinedRooms)
     .exec(function(err) {
       if( err ) {
         console.error('Can\'t init room model');
@@ -49,33 +48,6 @@ exports.user = {
   }
 }
 
-exports.token = {
-  create: function(userId, cb) {
-    crypto.randomBytes(128, function(err, buf) {
-      if( err ) { cb(err); return; }
-      var code = buf.toString('hex');
-      c.setex('tokens/'+userId, config.token_expire_time, code, function(err) {
-        cb(err, err ? undefined : code);
-      });
-    });
- 
-  }, 
-  check: function(userId, userToken, cb) {
-    c.get('tokens/'+userId, function(err, token) {
-      if( err ) { cb(err); return; }
-      if( userToken === token ) {
-        cb(null, true);
-        c.del('tokens/'+userId, function(err) {
-          if( err ) { lib.log.fwarn('-', 'token check', 'token delete error: '+err); }
-        });
-      } else {
-        cb(null, false);
-      }
-    });
-  }
-}
-
-/*
 exports.extension = {
   create: function(cb) {
     crypto.randomBytes(128, function(err, buf) {
@@ -102,7 +74,7 @@ exports.extension = {
   remove: function(code, cb) {
     c.hdel('extensions', code, cb);
   }
-}*/
+}
 
 exports.rateLimit = {
   check: function(cfg, ip, cb) {

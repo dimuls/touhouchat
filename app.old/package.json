@@ -1,0 +1,17 @@
+{
+  "name": "touhouchat",
+  "version": "1.0.8",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "moment": "2.0.0",
+    "socket.io": "0.9.16",
+    "escape-html": "1.0.0",
+    "redis": "0.8.4",
+    "hiredis": "0.1.15",
+    "redis-scripto": "0.1.2",
+    "gm": "1.11.0"
+  }
+}
