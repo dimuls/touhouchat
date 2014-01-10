@@ -1,5 +1,5 @@
-module.exports = {
-  
+module.exports = { 
+
   user: {
     init: function(cause, type, req) {
       return {
@@ -49,7 +49,7 @@ module.exports = {
   message: {
     write: function(cause, type, req) {
       return {
-        msg: 'Не удалось написать сообщени: '+( cause || 'ошибка БД' )+'.',
+        msg: 'Не удалось написать сообщение: '+( cause || 'ошибка БД' )+'.',
         type: type || 'db',
         req: req || 'message write'
       };

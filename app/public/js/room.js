@@ -16,7 +16,7 @@ $(document).ready(function() {
     ko.mapping.fromJS(data, {}, self);
     $.each(data, function(key) {
       self[key].subscribe(function() {
-        $.cookie('acc', ko.mapping.toJS(self));
+        $.cookie('user', ko.mapping.toJS(self));
       });
     });
   }
@@ -83,10 +83,7 @@ $(document).ready(function() {
     };
 
     self.write = function() {
-      app.api.message.write(self.msg(), self.images(), function(err, msg) {
-        if( err ) { alert('Не удалось написать сообщение: '+err.msg+'.'); return; }
-        chat.addMessage(msg);
-      });
+      app.io.emit('message write', { text: self.text(), images: self.images });
     };
 
     self.addImage = function(image) {
@@ -115,7 +112,6 @@ $(document).ready(function() {
     self.loadMessages = function() {
       app.io.emit('messages get');
     }
-    self.loadMessages();
   };
 
   app.Room = function(name, application) {
@@ -126,6 +122,12 @@ $(document).ready(function() {
     });
     self.newMessagesCount = ko.observable(0);
     self.usersCount = ko.observable(0);
+    self.newMessage = function() {
+      self.newMessagesCount(self.newMessagesCount()+1);
+    }
+    self.clearCounter = function() {
+      self.newMessagesCount(0);
+    }
   }
 
   app.App = function() {
@@ -136,10 +138,15 @@ $(document).ready(function() {
       create: function(opt) { return new app.Room(opt.data, self); },
       key: function(room) { return ko.unwrap(room.name); }
     });
-    self.currentRoom(self.rooms()[0]);
+    var index = self.rooms.mappedIndexOf({ name: app.params.room });
+    if( index == -1 ) {
+      self.currentRoom(new app.Room(app.params.room, self));
+    } else {
+      self.currentRoom(self.rooms()[index]);
+    }
     self.listenRooms = ko.computed(function() {
       var currentRoomName = self.currentRoom().name();
-      return $.grep(self.rooms(), function(room) { return room.name() === currentRoomName; });
+      return $.grep(self.rooms(), function(room) { return room.name() != currentRoomName; });
     });
 
     self.user = new app.User(app.user);
@@ -165,6 +172,17 @@ $(document).ready(function() {
       if( cb ) { cb(token); };
     });
 
+    app.io.on('message write', function(res) {
+      if( res.message ) {
+        self.chat.addMessage(res.message);
+      } else if( res.room ) {
+        var index = self.rooms.mappedIndexOf(res.room);
+        if( index > 0 ) {
+          self.rooms()[index].newMessage();
+        }
+      }
+    });
+
     app.io.on('messages get', function(messages) {
       ko.mapping.fromJS(messages, {}, self.chat.messages);
     });
@@ -182,18 +200,18 @@ $(document).ready(function() {
     });
 
     app.io.on('user init', function() {
-      
+      self.chat.loadMessages(); 
     });
 
-    app.io.on('error msg', function(err) {
+    app.io.on('err', function(err) {
       console.warn(err);
       alert(err.msg);
     });
 
     if( self.user.id() ) {
-      app.io.emit('user register');
-    } else {
       app.io.emit('user login', { uid: self.user.id() });
+    } else {
+      app.io.emit('user register');
     }
   };
 

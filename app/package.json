@@ -15,7 +15,7 @@
     "redis": "*",
     "hiredis": "*",
     "redis-scripto": "*",
-    "gm": "*"
-
+    "gm": "*",
+    "escape-html": "*"
   }
 }

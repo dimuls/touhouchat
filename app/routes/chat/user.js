@@ -4,23 +4,23 @@ module.exports = function(app, cfg, m, l) {
 
   app.io.route('user register', function(req) {
     m.rateLimit.check(cfg.rateLimit.userRegister, req.headers['x-real-ip'] || '127.0.0.1', function(err, limitExceed) {
-      if( err ) { c.emit('err', l.error.user.register()); return; }
-      if( limitExceed ) { c.emit('err', l.error.user.register('cлишком частая регистрация. Подождите 1 минуту', 'rate limit')); return; }
+      if( err ) { req.io.emit('err', l.error.user.register()); return; }
+      if( limitExceed ) { req.io.emit('err', l.error.user.register('cлишком частая регистрация. Подождите 1 минуту', 'rate limit')); return; }
     m.user.create(function(err, userId) {
       req.socket.chatUserId = userId;
-      c.emit('user register', userId);
+      req.io.emit('user register', userId);
   });});}); 
 
   app.io.route('user login', function(req) {
     var userId = req.data.uid;
     if( !userId || !userId.match(/^\w{128}$/) ) { req.io.emit('err', l.error.user.login('не верный UID', 'validation')); return; }
     m.rateLimit.check(cfg.rateLimit.userLogin, req.headers['x-real-ip'] || '127.0.0.1', function(err, limitExceed) {
-      if( err ) { c.emit('err', l.error.user.login()); return; }
-      if( limitExceed ) { c.emit('err', l.error.user.login('слишком частый логин. Подождите 1 минуту', 'rate limit')); return; }
+      if( err ) { req.io.emit('err', l.error.user.login()); return; }
+      if( limitExceed ) { req.io.emit('err', l.error.user.login('слишком частый логин. Подождите 1 минуту', 'rate limit')); return; }
     m.user.login(userId, function(err) {
-      if( err ) { c.emit('err', l.error.user.login()); return; }
+      if( err ) { req.io.emit('err', l.error.user.login()); return; }
       req.socket.chatUserId = userId;
-      c.emit('user login');
+      req.io.emit('user login');
   });});});   
 
   app.io.route('user init', function(req) {
@@ -34,16 +34,14 @@ module.exports = function(app, cfg, m, l) {
       return;
     }
     var chatUser = new l.ChatUser(req.socket.chatUserId, listenRooms, joinRoom);
-    chatUser.init(req, m);
-    c.emit('user init');
+    chatUser.init(req, m, l);
+    req.io.emit('user init');
   });
 
   app.io.route('disconnect', function(req) {
-    m.user.logout(req.socket.chatUserId, function(err) {
-      delete req.socket.chatUserId;
-      delete req.socket.chatUser;
-      if( err ) { l.log.fwarn(req.headers['x-real-ip'] || '127.0.0.1', 'disconnect', 'failed to logout'); return; }
-    });
+    if( req.socket.chatUser ) {
+      req.socket.chatUser.disconnect(req);
+    }
   });
 
 }

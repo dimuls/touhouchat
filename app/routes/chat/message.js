@@ -1,6 +1,8 @@
 module.exports = function(app, cfg, m, l) {
 
   app.io.route('messages get', function(req) {
+    var chatUser = req.socket.chatUser;
+    if( !chatUser ) { req.io.emit('err', l.error.messages.get('необходима регистрация', 'autorization')); return; }
     req.socket.chatUser.getMessages(function(err, messages) {
       if( err ) { req.io.emit('err', l.error.messages.get()); return; }
       req.io.emit('messages get', messages);
@@ -15,6 +17,8 @@ module.exports = function(app, cfg, m, l) {
   });
 
   app.io.route('message get', function(req) {
+    var chatUser = req.socket.chatUser;
+    if( !chatUser ) { req.io.emit('err', l.error.message.get('необходима регистрация', 'autorization')); return; }
     var room = req.data.room;
     var id = req.data.id;
     if( !room.match(/^\w+$/) || !id.toString().match(/^\d+$/) ) {
