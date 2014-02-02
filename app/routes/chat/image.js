@@ -3,7 +3,7 @@ module.exports = function(app, cfg, m, l) {
   app.post('/image/', function(req, res) {
     var userId = req.body.userId;
     var token = req.body.token;
-    if( !userId || !token || !userId.toString().match(/^\w{256}$/) || !token.toString().match(/^\w{256}$/) ) {
+    if( !userId || !token || !userId.toString().match(/^\w{128}$/) || !token.toString().match(/^\w{256}$/) ) {
       res.json({ err: { type: 'authorization', msg: 'нет доступа' } }); return;
     }
     m.token.check(userId, token, function(err, ok) {
@@ -13,15 +13,15 @@ module.exports = function(app, cfg, m, l) {
       if( req.body.url ) {
         file = req.body.url;
         uploader = l.image.download;
-      } else if( req.body.files && req.body.files.image ) {
-        file = req.body.files.image;
+      } else if( req.files && req.files.image ) {
+        file = req.files.image;
         uploader = l.image.upload;
       } else {
         res.json({ err: { type: 'image', msg: 'отсутствует изображение' }});
         return;
       }
-      uploader(file, cfg.paths.messageImages, function(err, id) {
-        if( err ) { res.json({ err: { type: 'image', msg: 'не удалось загрузить изображение', data: err } }); return; }
+      uploader(file.path, cfg.paths.messageImages, function(err, id) {
+        if( err ) { res.json({ err: err }); return; }
         res.json({ ok: 'ok', data: id });
       });
     });

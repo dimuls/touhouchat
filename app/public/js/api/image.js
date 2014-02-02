@@ -8,12 +8,13 @@ $(document).ready(function() {
     },
     api: {
       image: {
-        upload: function(token, image, cb) {
+        upload: function(userId, token, image, cb) {
           var data = new FormData();
-          dara.append('token', token);
+          data.append('userId', userId);
+          data.append('token', token);
           data.append('image', image);
           $.ajax({
-            url: app.urls.image.upload,
+            url: app.url.image.upload,
             cache: false,
             processData: false,
             contentType: false,
@@ -32,12 +33,13 @@ $(document).ready(function() {
               cb({ err:{ type: 'api', msg: 'нет доступа или ошибка доступа' } });
             });
         },
-        download: function(token, url, cb) {
+        download: function(userId, token, url, cb) {
           var data = new FormData();
+          dara.append('userId', userId);
           dara.append('token', token);
           data.append('url', url);
           $.ajax({
-            url: app.urls.image.download,
+            url: app.url.image.download,
             cache: false,
             processData: false,
             contentType: false,

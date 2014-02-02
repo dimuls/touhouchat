@@ -1,60 +1,103 @@
 extends layout
 
 block title
-  | anonchat.pw
+  | anonchat.pw/#{room}/
 
 block style
-  style(rel="stylesheet", href="/css/index.css")
+  link(href='http://fonts.googleapis.com/css?family=Play&subset=latin,cyrillic-ext,cyrillic,latin-ext', rel='stylesheet', type='text/css')
+  link(rel="stylesheet", href="/css/room.css")
 
 block content
-  .cht(data-bind="with: chat")
-    .msgs(data-bind="foreach: messages")
-      .msg
-        .txt(data-bind="html: text")
-    .edtr(data-bind="with: editor")
-       textarea.msg(data-bind="value: text")
-       button.wht(data-bind="click: clear") Очистить
-       button.blk(data-bind="click: write") Написать
-
-  .ctrls
-    .ctrl.rms(data-bind="foreach: rooms")
-      .rm(data-bind="text: name")
-    
-//  .hlp(data-bind="visible: helpVisible")
-//    .hdr Добро пожаловать
-//    .cnt <СПРАВКА>
-//
-//  .stngs(data-bind="visible: settingsVisible")
-//    .hdr Настройки
-//    .cnt
-//
-//  .ctrls
-//    .btn.right(data-bind="click: toggleSettings") Настройки
-//    .btn.right(data-bind="click: toggleHelp") Справка
-//  .chts(data-bind="foreach: chats")
-//    .cht
-//      .hdr(data-bind="text: name")
-//      .msgs(data-bind="foreach: messages")
-//        .msg
-//          .hdr
-//          .cnt
-//      .ctrls
-//        textarea.msg(data-bind="value: message")
-//        button.wht(data-bind="click: clear") Очистить
-//        button.blk(data-bind="click: write") Написать
+  .col.col-w5.col-cht(data-bind="with: chat")
+    .col-hdr
+      a(href="http://anonchat.pw") anonchat.pw
+      span(data-bind="text: room().path()")
+    .row.msgs(data-bind="foreach: messages, style: { bottom: editor.images().length ? '221px' : '161px'  }")
+      .msg(data-bind="css: { 'msg-actv': active }, attr: { id: 'msg-'+id() }")
+        .msg-hdr
+          strong
+            a(data-bind="click: goTo, attr: { href: linkLong }") /
+              span(data-bind="text: id")
+              | /
+            | &nbsp;|&nbsp;
+            span(data-bind="text: dt")
+            .msg-actv-btns.pll-rght
+              .btn.btn-sml(data-bind="click: unactive, css: { 'btn-wht': active }") снять выдел
+              | &nbsp;
+              .btn.btn-sml(data-bind="click: $root.goBack, css: { 'btn-wht': active }") назад
+            .msg-unactv-btns.pll-rght
+              | &nbsp;
+              .btn.btn-sml(data-bind="click: quoteAnswer, css: { 'btn-wht': active }") отв цит
+              | &nbsp;
+              .btn.btn-sml(data-bind="click: answer, css: { 'btn-wht': active }") отв
+              | &nbsp;
+              .btn.btn-sml(data-bind="click: quote, css: { 'btn-wht': active }") цит
+        .msg-in
+          .msg-imgs(data-bind="visible: images().length")
+            .imgs-tbnls
+              .imgs-tbnls-in(data-bind="foreach: images, hscroll")
+                a.img-tbnl(data-bind="style: { backgroundImage: 'url('+thumbnailPath()+')' }, attr: { href: path }", target="_blank")
+          .msg-txt(data-bind="html: text")
+    .row.edtr(data-bind="with: editor")
+      .edtr-row
+        textarea.txt-blk.txt-blk-edtr-msg(data-bind="value: text", placeholder="Введите Ваше сообщение", onfocus="this.placeholder = ''", onblur="this.placeholder = 'Введите Ваше сообщение'" )
+        .btn.btn-icon.icon-image.btn-edtr-img(data-bind="click: imager.run, css:{ 'btn-dsbld': imager.adding }")
+        input(tabindex="-1", accept="image/*", id="inp-imgs", type="file", multiple)
+      .edtr-row.edtr-row-imgs.imgs-tbnls(data-bind="visible: images().length")
+        .imgs-tbnls-in(data-bind="foreach: images, hscroll")
+          .img-tbnl(data-bind="style: { backgroundImage: 'url('+thumbnailPath()+')' }")
+            .btn.btn-wht.btn-close.btn-img-rm(data-bind="click: remove") ×
+      .edtr-row
+        .btn.btn-wht(data-bind="click: clear, css:{ 'btn-dsbld': imager.adding }") Очистить
+        .btn.pll-rght(data-bind="click: write, css:{ 'btn-dsbld': imager.adding }") Написать
+  .col-cnt
+    .col.col-w3(data-bind="visible: additionalVisible")
+      .row.row-rms
+        .btn.btn-rm(data-bind="click: toggleSettings") Параметры
+        .btn.btn-rm(data-bind="click: toggleHelp") Справка
+      .col-hr
+      .row.row-rms(data-bind="foreach: allRooms")
+        .btn.btn-rm(data-bind="css: { actv: current }, click: goTo")
+          span(data-bind="text: nameTxt")
+          .cnt(data-bind="visible: newMessagesCount, text: newMessagesCount")
+          
+    .col.col-w3.col-add(data-bind="visible: settingsVisible")
+      .col-hdr.col-hdr-scnd
+        Параметры
+        .btn.btn-wht.btn-close(data-bind="click: toggleSettings") ×
+      .col-hr
+    .col.col-w3.col-add(data-bind="visible: helpVisible")
+      .col-hdr.col-hdr-scnd
+        Справка
+        .btn.btn-wht.btn-close(data-bind="click: toggleHelp") ×
+      .col-hr
+//    .col.col-w3.col-add(data-bind="visible: imagesVisible")
+//      .col-hdr.col-hdr-scnd
+//        Изображения
+//        .btn.btn-wht.btn-close(data-bind="click: toggleImages") ×
+//      .col-hr
 
 block script
+  script(type='text/javascript', src="/socket.io/socket.io.js")
   script(type='text/javascript', src="/js/lib/jquery.js")
   script(type='text/javascript', src="/js/lib/jquery/cookie.js")
+  script(type='text/javascript', src="/js/lib/jquery/scrollTo.js")
+  script(type='text/javascript', src="/js/lib/jquery/debounce.js")
+  script(type='text/javascript', src="/js/lib/jquery/mousewheel.js")
   script(type='text/javascript', src="/js/lib/knockout.js")
   script(type='text/javascript', src="/js/lib/knockout/mapping.js")
-  script(type='text/javascript', src="/socket.io/socket.io.js")
   script(type='text/javascript', src="/js/api/image.js")
+  script(type='text/javascript', src="/js/api/chat.js")
   script(type='text/javascript').
     $(document).ready(function() {
       window.app = $.extend(true, {
+        conf: {
+          imageSizeLimit: #{ cfg.image.sizeLimit },
+          logLimit: #{ cfg.model.log_size_limit }
+        },
         params: {
-          room: '#{ joinRoom }'
+          room: '#{ room }',
+          message: #{ message || 'null' }
         }
       }, window.app);
     });

@@ -7,6 +7,6 @@ end
 
 local loginCount = redis.call('hincrby', userKey, 'login', 1)
 
-if loginCount > 10 then
-  return redis.error_reply('Uid'..uid..' already used')
+if loginCount > 1000 then
+  return redis.error_reply('Uid'..uid..' too many logins')
 end

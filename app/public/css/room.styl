@@ -1,0 +1,377 @@
+html, body
+  padding 0
+  margin 0
+  height 100%
+  width 100%
+  font-family: 'Play', sans-serif;
+  font-size 16px
+  background grey
+  box-sizing border-box
+  -moz-box-sizing border-box
+  -webkit-box-sizing border-box
+  -o-box-sizing border-box
+
+body
+  padding 10px
+  text-align left
+  white-space nowrap
+
+button, textarea, input, div, span, ul, li, p, q, a
+  padding 0
+  margin 0
+  box-sizing border-box
+  -moz-box-sizing border-box
+  -webkit-box-sizing border-box
+  -o-box-sizing border-box
+
+
+input, textarea
+  font-size 16px
+  font-family: 'Play', sans-serif;
+
+#inp-imgs
+  position fixed
+  left -1000px
+  right -1000px
+
+q
+  display block
+  color #006d37
+  font-style italic
+  quotes none
+
+.pll-rght
+  float right
+  margin-left 5px
+  &:first-child
+    margin-left 0
+
+.icon-image    { background-image: url("/img/i/image-inverse.svg") !important; }
+.icon-settings { background-image: url("/img/i/settings-inverse.svg") !important; }
+.icon-no-sound { background-image: url("/img/i/no-sound-inverse.svg") !important; }
+.icon-sound    { background-image: url("/img/i/sound-inverse.svg")    !important; }
+.icon-help     { background-image: url("/img/i/help-inverse.svg")     !important; }
+.icon-image:hover,    .icon-image.active    { background-image: url("/img/i/image.svg")    !important; }
+.icon-settings:hover, .icon-settings.active { background-image: url("/img/i/settings.svg") !important; }
+.icon-no-sound:hover, .icon-no-sound.active { background-image: url("/img/i/no-sound.svg") !important; }
+.icon-sound:hover,    .icon-sound.active    { background-image: url("/img/i/sound.svg")    !important; }
+.icon-help:hover,     .icon-help.active     { background-image: url("/img/i/help.svg")     !important; }
+.btn-dsbld.icon-image:hover,    .btn-dsbld.icon-image.active    { background-image: url("/img/i/image-inverse.svg")    !important; }
+.btn-dsbld.icon-settings:hover, .btn-dsbld.icon-settings.active { background-image: url("/img/i/settings-inverse.svg") !important; }
+.btn-dsbld.icon-no-sound:hover, .btn-dsbld.icon-no-sound.active { background-image: url("/img/i/no-sound-inverse.svg") !important; }
+.btn-dsbld.icon-sound:hover,    .btn-dsbld.icon-sound.active    { background-image: url("/img/i/sound-inverse.svg")    !important; }
+.btn-dsbld.icon-help:hover,     .btn-dsbld.icon-help.active     { background-image: url("/img/i/help-inverse.svg")     !important; }
+
+
+.btn
+  display inline-block
+  line-height 19px
+  border none
+  background #222
+  color lightgrey
+  padding 5px
+  border-radius 5px
+  cursor pointer
+  &.btn-dsbld
+    background-color grey
+    color light-grey
+    box-shadow none
+    cursor default
+    &:hover,
+    &:focus,
+    &.actv
+      background-color grey
+      color lightgrey
+      box-shadow none
+      cursor default
+  &.btn-sml
+    padding 0 2px
+    font-size 12px
+    line-height 12px
+  &:focus,
+  &:hover
+    background white
+    color black
+    box-shadow 0 0 4px black
+  &.actv,
+  &.actv:hover
+    background lightgrey
+    color black
+    box-shadow none
+    cursor default
+  &.actv.btn-tgl:hover
+    cursor pointer
+    box-shadow 0 0 4px black
+  &:active
+    background lightgrey
+  &.btn-wht
+    background white
+    color #333
+    border 1px solid lightgrey
+    padding 5px
+    &.btn-dsbld
+      background-color lightgrey
+      color grey
+      box-shadow none
+      cursor default
+      &:hover,
+      &:focus,
+      &.actv
+        background-color lightgrey
+        color grey
+        box-shadow none
+        cursor default
+    &:hover 
+      box-shadow 0 0 4px grey
+      color black
+    &:active 
+      background lightgrey
+      color black
+    &.btn-sml:hover 
+      box-shadow 0 0 2px grey
+    &.btn-sml 
+      padding 0 2px 1px 2px
+    
+  &.btn-icon
+    width 29px
+    height 29px
+    background-size 21px !important
+    background-repeat no-repeat !important
+    background-position center center !important
+    background-attachment local !important
+
+  &.btn-rm
+    margin-right 5px
+    &:last-child
+      margin-right 0
+
+  &.btn-close
+    position absolute
+    right 10px
+    top 10px
+    height 24px
+    width 24px
+    padding 0
+    line-height 20px
+    &.btn-img-rm
+      box-sizing border-box
+      -moz-box-sizing border-box
+      -webkit-box-sizing border-box
+      -o-box-sizing border-box
+      border-radius 3px
+      right 3px
+      top 3px
+      width 10px
+      height 10px
+      line-height 6px
+      vertical-align middle
+      text-align center
+
+  &.btn-edtr-img
+    height 100px
+    margin-left 5px
+    vertical-align top
+
+doesnotexist:-o-prefocus, .btn.btn-icon 
+  border-radius: 0px;
+
+.txt-blk
+  min-height 30px
+  line-height 20px
+  padding 5px
+  border 0 solid black
+  background #222
+  color lightgrey
+  border-radius 5px
+  font-size 16px
+  &:hover
+    box-shadow 0 0 4px grey
+    color black
+    background white
+  &:focus
+    color black
+    background white
+    box-shadow 0 0 4px black
+  &.actv
+    background lightgrey
+    color black
+  &.stc:hover
+    background #222
+    color lightgrey
+    box-shadow none !important
+
+  &.txt-blk-edtr-msg
+    width 446px
+    height 100px
+    line-height 20px
+    font-size 16px
+    padding 10px
+    overflow-x hidden
+    overflow-y auto
+    resize none
+
+.col
+  white-space normal
+  vertical-align top
+  text-align left
+  position relative
+  display inline-block
+  box-sizing border-box
+  -moz-box-sizing border-box
+  -webkit-box-sizing border-box
+  -o-box-sizing border-box
+  padding 10px
+  width 400px
+  margin-right 10px
+  background-image url(/img/bg-1.png)
+  box-shadow 0 0 5px black
+  border-radius 5px
+  &.col-w2
+    width 200px
+  &.col-w3
+    width 300px
+  &.col-w4
+    width 400px
+  &.col-w5
+    width 500px
+  &.col-w6
+    width 600xp
+  .col-hdr
+    height 60px
+    line-height 60px
+    text-align center
+    font-size 32px
+    text-shadow 0px 1px 1px #4d4d4d
+    color #222
+    cursor default
+    a, span
+      color #222
+      text-decoration none
+    &.col-hdr-scnd
+      font-size 24px
+      line-height 35px
+      height 35px
+
+  .row
+    box-sizing border-box
+    -moz-box-sizing border-box
+    -webkit-box-sizing border-box
+    -o-box-sizing border-box
+    &.row-rms
+      line-height 35px
+      text-align center
+  
+  .col-hr
+    display block
+    margin 7px 0 10px 0
+    height 1px
+    box-shadow 1px 2px 3px black
+
+.col-cht
+  height 100%
+  min-height 600px
+  .msgs
+    position absolute
+    right 10px
+    left 10px
+    top 70px
+    bottom 161px
+    overflow-x hidden
+    overflow-y auto
+    background #222
+    border-radius 5px
+    color lightgrey
+    min-height 300px
+    .msg
+      padding 10px
+      border-bottom 1px solid grey
+      .msg-in
+        max-height 200px
+        overflow-y auto
+        overflow-x hidden
+      &.msg-actv
+        background lightgrey
+        color #222
+        .msg-actv-btns
+          display inline
+        &:hover
+          .msg-unactv-btns
+            display none
+      &:last-child
+        border-bottom 0
+      .msg-hdr
+        font-size 12px
+        margin-bottom 5px
+        color grey
+      .msg-actv-btns,
+      .msg-unactv-btns
+        display none
+      &:hover
+        .msg-unactv-btns
+          display inline
+      a
+        text-decoration none
+        text-decoration-color #00cccc
+        color #00cccc
+        &:visited
+          color #088
+  .edtr
+    position absolute
+    right 10px
+    left 10px
+    bottom 10px
+    .edtr-row
+      width 100%
+      padding-top 10px
+      &:first-child
+        padding-top 0
+      &.edtr-row-imgs
+        margin-top 5px
+        background #222
+        border-radius 5px 
+
+
+
+.col-cnt
+  display inline-block
+  position relative
+  height 100%
+  & > .col
+    display block
+    margin-bottom 10px
+    &:last-child
+      margin-bottom 0
+
+.imgs-tbnls
+  height 60px
+  padding 5px !important
+  overflow hidden
+ .imgs-tbnls-in
+    white-space nowrap
+    height 200px
+    overflow-x scroll
+    overflow-y hidden
+  &.imgs-tbnls-big
+    height 110px
+    
+
+
+.img-tbnl
+  position relative
+  display inline-block
+  width 50px
+  height 50px
+  margin-right 5px
+  background-repeat no-repeat
+  background-size contain
+  background-position center
+  &:last-child
+    margin-right 0
+  .btn-img-rm
+    display none
+  &:hover
+    .btn-img-rm
+      display block
+  &.img-tbnl-big
+    width 100px
+    height 100px

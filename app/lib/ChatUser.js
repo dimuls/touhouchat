@@ -12,8 +12,9 @@ var ChatUser = function(userId, listenRooms, joinRoom) {
 
 };
 
-ChatUser.prototype.init = function(req, model, lib) {
+ChatUser.prototype.init = function(req, app, model, lib) {
   this.ip = req.headers['x-real-ip'] || '127.0.0.1';
+  this.app = app;
   this.model = model;
   this.lib = lib;
   this.socket = req.socket;
@@ -62,21 +63,25 @@ ChatUser.prototype.leave = function(req) {
     req.io.join(this.joinRoomListenPath());
   };
   var self = this;
-  this.room.clearIfCustom(function(err) {
-    if( err ) { self.lib.log.fwarn(self.ip, 'room leave', '[uid:'+self.userId+'] failed to clear room'); }
-  });
+  if( this.app.io.sockets.clients(this.joinRoomPath()).length === 0 ) {
+    this.room.clearIfCustom(function(err) {
+      if( err ) { self.lib.log.fwarn(self.ip, 'room leave', '[uid:'+self.userId+'] failed to clear room'); }
+    });
+  }
   delete this.joinRoom;
   delete this.room;
+  req.io.emit('room leave');
 };
 
 ChatUser.prototype.join = function(req, room) {
-  this.leave();
+  this.leave(req);
   if( this.isListenRoom(room) ) {
     req.io.leave(this.listenPath(room));
   };
   this.joinRoom = room;
   this.room = this.model.room(room);
   req.io.join(this.joinRoomPath());
+  req.io.emit('room join');
 };
 
 ChatUser.prototype.logMessage = function(message) {
@@ -84,7 +89,7 @@ ChatUser.prototype.logMessage = function(message) {
     this.ip,
     'message write',
     '[uid:'+this.userId+'] wrote message #/'+this.joinRoom+'/'+message.id+'/'+(
-      message.images.length  > 0 ? ' with images '+message.images.join(', ') : ''
+      message.images.length  > 0 ? ' with images '+_.map(message.images, function(image) { return image.id }).join(', ') : ''
     )
   );
 };
@@ -93,11 +98,18 @@ ChatUser.prototype.writeMessage = function(req, message) {
   if( !this.isJoined() ) { req.io.emit('err', this.lib.error.message.write('отсутствует открытый чат', 'controller')); return; }
 
   var text = this.lib.text.prepare(message.text, this.joinRoom);
-  var images = _.filter(message.images, function(image) { return image.match(/^\/img\/message\/\w+.(?:jpg|gif)$/) });
+  var images = _.filter(message.images, function(image) { return image && image.id && image.ext && image.id.match(/^\w{64}$/) && image.ext.match(/^(jpg|png|gif)$/) });
 
-  if( ( !images && text.length < 1) || text.length > 5000 ) {
-    req.io.emit('err', this.lib.error.message.write('cообщение может содержать от 1 до 5000 символов без картинки и до 5000 символов с картинкой', 'validation'));
-    return;
+  if( images.length === 0 ) {
+    if( text.length < 1 || text.length > 5000 ) {
+      req.io.emit('err', this.lib.error.message.write('cообщение без картинки может содержать от 1 до 5000 символов', 'validation'));
+      return;
+    }
+  } else {
+    if( text.length > 5000 ) {
+      req.io.emit('err', this.lib.error.message.write('cообщение с картинкой может содержать до 5000 символов', 'validation'));
+      return;
+    }
   }
 
   var message = { text: text, images: images };
@@ -106,10 +118,10 @@ ChatUser.prototype.writeMessage = function(req, message) {
   this.room.msg.add(message, function(err, message) {
     if( err ) { req.io.emit('err', self.lib.error.message.write()); return; }
     message.author = false;
-    req.io.room(self.joinRoomPath()).broadcast('message write', { message: message });
-    req.io.room(self.joinRoomListenPath()).broadcast('message write', { room: self.joinRoom });
+    req.io.room(self.joinRoomPath()).broadcast('room message', { room: self.joinRoom, message: message });
+    req.io.room(self.joinRoomListenPath()).broadcast('room message', { room: self.joinRoom });
     message.author = true;
-    req.io.emit('message write', { message: message });
+    req.io.emit('message write', message);
     self.logMessage(message);
   });
 };
@@ -122,11 +134,13 @@ ChatUser.prototype.disconnect = function(req) {
   var self = this;
   this.model.user.logout(this.userId, function(err) {
     if( err ) { self.lib.log.fwarn(self.ip, 'disconnect', '[uid:'+self.userId+'] failed to logout user'); }
-    self.room.clearIfCustom(function(err) {
-      if( err ) { self.lib.log.fwarn(self.ip, 'disconnect', '[uid:'+self.userId+'] failed to clear room'); }
-      delete req.socket.chatUser;
-      delete req.socket.chatUserId;
-    });
+    if( this.app.io.sockets.clients(this.joinRoomPath()).length === 0 ) {
+      self.room.clearIfCustom(function(err) {
+        if( err ) { self.lib.log.fwarn(self.ip, 'disconnect', '[uid:'+self.userId+'] failed to clear room'); }
+        delete req.socket.chatUser;
+        delete req.socket.chatUserId;
+      });
+    }
   });
 };
 

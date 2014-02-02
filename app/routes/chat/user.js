@@ -34,7 +34,7 @@ module.exports = function(app, cfg, m, l) {
       return;
     }
     var chatUser = new l.ChatUser(req.socket.chatUserId, listenRooms, joinRoom);
-    chatUser.init(req, m, l);
+    chatUser.init(req, app, m, l);
     req.io.emit('user init');
   });
 

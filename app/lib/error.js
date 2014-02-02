@@ -27,17 +27,17 @@ module.exports = {
   },
 
   token: {
-    create: function(cause, type, req) {
+    get: function(cause, type, req) {
       return {
         msg: 'Не удалось сгенерировать токен: '+( cause || 'ошибка БД' )+'.',
         type: type || 'db',
-        req: req || 'token create'
+        req: req || 'token get'
       };
     }
   },
 
   messages: {
-    create: function(cause, type, req) {
+    get: function(cause, type, req) {
       return {
         msg: 'Не получить сообщения: '+( cause || 'ошибка БД' )+'.',
         type: type || 'db',

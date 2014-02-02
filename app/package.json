@@ -16,6 +16,7 @@
     "hiredis": "*",
     "redis-scripto": "*",
     "gm": "*",
-    "escape-html": "*"
+    "escape-html": "*",
+    "connect-busboy": "*"
   }
 }
