@@ -1,8 +1,8 @@
 var escapeHtml = require('escape-html')
-  , gruff = require('./gruff');
+  , wakabamark = require('./wakabamark');
 
 exports.prepare = function(text, room) {
   return text
-    ? gruff(escapeHtml(text.replace(/(^\s+|\s+$)/, '')), room)
+    ? wakabamark(escapeHtml(text.replace(/(^\s+|\s+$)/, '')), room)
     : '';
 }

@@ -14,13 +14,13 @@ module.exports = function(app, cfg, m, l) {
         file = req.body.url;
         uploader = l.image.download;
       } else if( req.files && req.files.image ) {
-        file = req.files.image;
+        file = req.files.image.path;
         uploader = l.image.upload;
       } else {
         res.json({ err: { type: 'image', msg: 'отсутствует изображение' }});
         return;
       }
-      uploader(file.path, cfg.paths.messageImages, function(err, id) {
+      uploader(file, cfg.paths.messageImages, function(err, id) {
         if( err ) { res.json({ err: err }); return; }
         res.json({ ok: 'ok', data: id });
       });

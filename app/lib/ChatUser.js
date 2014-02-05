@@ -35,11 +35,7 @@ ChatUser.prototype.isJoined = function() {
 };
 
 ChatUser.prototype.isListenRoom = function(room) {
-  return _.contains(this.listenRooms, this.joinRoom);
-};
-
-ChatUser.prototype.roomPath = function(room) {
-  return 'room/listen/'+room;
+  return _.contains(this.listenRooms, room);
 };
 
 ChatUser.prototype.listenPath = function(room) {
@@ -51,7 +47,7 @@ ChatUser.prototype.joinRoomListenPath = function() {
 };
 
 ChatUser.prototype.joinRoomPath = function() {
-  return this.roomPath(this.joinRoom);
+  return 'room/join/'+this.joinRoom;
 };
 
 ChatUser.prototype.leave = function(req) {
@@ -88,7 +84,7 @@ ChatUser.prototype.logMessage = function(message) {
   this.lib.log.flog(
     this.ip,
     'message write',
-    '[uid:'+this.userId+'] wrote message #/'+this.joinRoom+'/'+message.id+'/'+(
+    '[uid:'+this.userId+'] wrote message /'+this.joinRoom+'/'+message.id+'/'+(
       message.images.length  > 0 ? ' with images '+_.map(message.images, function(image) { return image.id }).join(', ') : ''
     )
   );
@@ -101,6 +97,7 @@ ChatUser.prototype.writeMessage = function(req, message) {
   var images = _.filter(message.images, function(image) { return image && image.id && image.ext && image.id.match(/^\w{64}$/) && image.ext.match(/^(jpg|png|gif)$/) });
 
   if( images.length === 0 ) {
+    images = null;
     if( text.length < 1 || text.length > 5000 ) {
       req.io.emit('err', this.lib.error.message.write('cообщение без картинки может содержать от 1 до 5000 символов', 'validation'));
       return;

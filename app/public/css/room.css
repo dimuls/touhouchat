@@ -473,3 +473,9 @@ doesnotexist:-o-prefocus,
   width: 100px;
   height: 100px;
 }
+.new-msg-cnt {
+  font-size: 10px;
+  line-height: 6px;
+  vertical-align: super;
+  margin-left: 2px;
+}

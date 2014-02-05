@@ -1,10 +1,14 @@
 $(document).ready(function() {
 
   window.app = $.extend(true, {
-    io: io.connect(),
     api: {
       chat: {
         _io_tmp: { },
+        _init: function() {
+          $.each(app.api.chat._io_cb, function(route, cb) {
+            app.io.on(route, cb);
+          });
+        },
 
         err: function(cb, once) {
           if( cb ) {
@@ -175,8 +179,4 @@ $(document).ready(function() {
       },
     }
   }, window.app);
-
-  $.each(app.api.chat._io_cb, function(route, cb) {
-    app.io.on(route, cb);
-  });
 });

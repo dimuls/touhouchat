@@ -27,7 +27,7 @@ module.exports = function(app, cfg, m, l) {
     var userId = req.socket.chatUserId;
     if( !userId ) { l.log.fwarn(req.headers['x-real-ip'] || '127.0.0.1', 'user init', 'user init without UID'); return; }
     var joinRoom = req.data.currentRoom;
-    var listenRooms = _.uniq(req.data.subscribedRooms);
+    var listenRooms = _.uniq(req.data.listenRooms);
     var allRooms = _.uniq(listenRooms.concat(joinRoom));
     if( _.some(allRooms, function(room) { return typeof room != 'string' || !room.match(/^\w+$/);  }) ) {
       req.io.emit('err', l.error.user.init('имя комнаты может содержать только символы алфавита.', 'validation'));

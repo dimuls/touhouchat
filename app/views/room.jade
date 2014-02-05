@@ -59,7 +59,7 @@ block content
       .row.row-rms(data-bind="foreach: allRooms")
         .btn.btn-rm(data-bind="css: { actv: current }, click: goTo")
           span(data-bind="text: nameTxt")
-          .cnt(data-bind="visible: newMessagesCount, text: newMessagesCount")
+          span.new-msg-cnt(data-bind="visible: newMessagesCount, text: '('+newMessagesCount()+')'")
           
     .col.col-w3.col-add(data-bind="visible: settingsVisible")
       .col-hdr.col-hdr-scnd

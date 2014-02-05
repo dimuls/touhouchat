@@ -45,7 +45,7 @@ $(document).ready(function() {
 
   app.Message = function(data, chat, editor, application) {
     var self = this;
-    if( !data.images || data.images.length === undefined ) { data.images = []; } // этот костыль из-за lua cjson
+    if( !data.images || data.images.length === undefined ) { data.images = []; }
     ko.mapping.fromJS(data, {
       images: {
         create: function(opt) { return new app.Image(opt.data, editor); },
@@ -241,7 +241,6 @@ $(document).ready(function() {
           self.loadMessages();
         });
       } else {
-        console.log(1);
         self.activeMessageId(messageId);
       }
     };

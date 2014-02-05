@@ -45,7 +45,7 @@ exports.user = {
     clua.run('userLogout', [], [uid], cb);
   },
   remove: function(uid, cb) {
-    c.del('users/'+uid, cb)
+    c.del('@'+uid, cb)
   }
 }
 
