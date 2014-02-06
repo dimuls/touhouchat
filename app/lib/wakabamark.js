@@ -132,32 +132,32 @@ var WM = function() {
 			str = str.replace(this.clinks.exp, this.clinks.rep);
 		}
 
-    var linkTmpl_type1 = '<a href="$1" data-bind="click: $root.chat.changeRoom.bind($data, \'$2\', \'$3\')">$4</a>';
-    var linkTmpl_type2 = '<a href="$1" data-bind="click: $root.chat.changeRoom.bind($data, \'$2\')">$1</a>';
-    var linkTmpl_type3 = '<a href="/'+room+'$1" data-bind="click: $root.chat.changeRoom.bind($data, \''+room+'\', \'$2\')">$1</a>';
+    var linkTmpl_type1 = '<a href="$1" data-bind="click: appGoTo.bind($data, \'$1\')">$2</a>';
+    var linkTmpl_type2 = '<a href="$1" data-bind="click: appGoTo.bind($data, \'$1\')">$1</a>';
+    var linkTmpl_type3 = '<a href="/'+room+'$1" data-bind="click: appGoTo.bind($data, \'/'+room+'$1\')">$1</a>';
 
 		if(this.options.makeAnonchatLinks) {
       str = str.replace(/(?:\s|>|^)(\/\w*[A-Za-z_]\w*\/\d+\/)(?:\s|<|$)/g, function(match, link) {
         var parts = match.split('/')
         var res = parts[1] == room
-          ? '<!-- anonchatLink(1,'+link+','+parts[1]+','+parts[2]+',/'+parts[2]+'/) -->'
-          : '<!-- anonchatLink(1,'+link+','+parts[1]+','+parts[2]+','+link+') -->';
+          ? '<!-- anonchatLink(1,'+link+',/'+parts[2]+'/) -->'
+          : '<!-- anonchatLink(1,'+link+','+link+') -->';
         return parts[0]+res+parts[3];
       });
 
       str = str.replace(/(?:\s|>|^)(\/\w*[A-Za-z_]\w*\/)(?:\s|<|$)/g, function(match, link) {
         var parts = match.split('/')
-        return parts[0]+'<!-- anonchatLink(2,'+link+','+parts[1]+') -->'+parts[2];
+        return parts[0]+'<!-- anonchatLink(2,'+link+') -->'+parts[2];
       });
 
       str = str.replace(/(?:\s|>|^)(\/\d+\/)(?:\s|<|$)/g, function(match, link) {
         var parts = match.split('/')
-        return parts[0]+'<!-- anonchatLink(3,'+link+','+parts[1]+') -->'+parts[2];
+        return parts[0]+'<!-- anonchatLink(3,'+link+') -->'+parts[2];
       });
 
-      str = str.replace(/<!-- anonchatLink\(1,(.+?),(.+?),(.+?),(.+?)\) -->/ig, linkTmpl_type1)
-      str = str.replace(/<!-- anonchatLink\(2,(.+?),(.+?)\) -->/ig          , linkTmpl_type2)
-      str = str.replace(/<!-- anonchatLink\(3,(.+?),(.+?)\) -->/ig          , linkTmpl_type3);
+      str = str.replace(/<!-- anonchatLink\(1,(.+?),(.+?)\) -->/ig    , linkTmpl_type1)
+      str = str.replace(/<!-- anonchatLink\(2,(.+?)\) -->/ig          , linkTmpl_type2)
+      str = str.replace(/<!-- anonchatLink\(3,(.+?)\) -->/ig          , linkTmpl_type3);
 
 		}
 

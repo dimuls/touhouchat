@@ -37,7 +37,7 @@ block content
             .imgs-tbnls
               .imgs-tbnls-in(data-bind="foreach: images, hscroll")
                 a.img-tbnl(data-bind="style: { backgroundImage: 'url('+thumbnailPath()+')' }, attr: { href: path }", target="_blank")
-          .msg-txt(data-bind="html: text")
+          .msg-txt(data-bind="html: text, applyBindings")
     .row.edtr(data-bind="with: editor")
       .edtr-row
         textarea.txt-blk.txt-blk-edtr-msg(data-bind="value: text", placeholder="Введите Ваше сообщение", onfocus="this.placeholder = ''", onblur="this.placeholder = 'Введите Ваше сообщение'" )

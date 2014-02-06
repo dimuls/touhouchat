@@ -26,7 +26,15 @@ $(document).ready(function() {
         event.preventDefault();
       });
     }
-  }
+  };
+
+  ko.bindingHandlers.applyBindings = {
+    init: function(element, valueAccessor, allBindings, bindingContext) {
+      $(element).children().each(function(i, child) {
+        ko.applyBindings(bindingContext, child);
+      });
+    }
+  };
 
 
   app.User = function(data) {
@@ -52,6 +60,8 @@ $(document).ready(function() {
         key: function(image) { return ko.unwrap(image.id); }
       }
     }, self);
+
+    self.appGoTo = application.goTo;
 
     self.quote = function() {
       // TODO
@@ -241,7 +251,6 @@ $(document).ready(function() {
           self.loadMessages();
         });
       } else {
-        console.log(1);
         self.activeMessageId(messageId);
       }
     };
@@ -395,9 +404,7 @@ $(document).ready(function() {
 
     // Routing
 
-    self.goTo = function(path) {
-      if( path == window.location.pathname ) { return; }
-      history.pushState({}, 'anonchat.pw'+path, path);
+    self._loadPath = function(path) {
       if( res = path.match(/^\/([A-Za-z]\w*)\/$/) ) {
         var room = res[1];
         self.chat.changeRoom(room);
@@ -406,23 +413,22 @@ $(document).ready(function() {
         var message = res[2];
         self.chat.changeRoom(room, message);
       }
+    }
+
+    self.goTo = function(path) {
+      if( path == window.location.pathname ) { return; }
+      history.pushState({}, 'anonchat.pw'+path, path);
+      self._loadPath(path);
     }
 
     self.goBack = function() {
       history.go(-1);
-      var path = window.location.pathname;
-      if( res = path.match(/^\/([A-Za-z]\w*)\/$/) ) {
-        var room = res[1];
-        self.chat.changeRoom(room);
-      } else if( res = path.match(/^\/([A-Za-z]\w*)\/(\d+)\/$/) ) {
-        var room = res[1];
-        var message = res[2];
-        self.chat.changeRoom(room, message);
-      }
     }
 
-
-
+    window.onpopstate = function(e) {
+      var path = window.location.pathname;
+      self._loadPath(path);
+    };
 
 
     // Initializing
