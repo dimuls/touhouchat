@@ -59,6 +59,10 @@ $(document).ready(function() {
               if( once ) { cb.once = once; }
               app.api.chat._io_tmp['room message'] = cb;
             }
+          },
+          listen: {
+            stop: function(room) { app.io.emit('room listen stop', room); },
+            start: function(room) { app.io.emit('room listen start', room); }
           }
         },
         message: {

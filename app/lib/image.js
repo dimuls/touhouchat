@@ -26,7 +26,7 @@ exports.download = function(url, targetPath, cb) {
   try {
     http.get(url, function(err, buffer) {
       if( err ) { cb({ type: 'server', msg: err }); return; }
-      processImage(gm(sourcePath, 'image'), targetPath, cb);
+      processImage(gm(buffer, 'image'), targetPath, cb);
     });
   } catch(err) {
     cb({ type: 'server', msg: 'неожиданная ошибка('+err+')', data: err });

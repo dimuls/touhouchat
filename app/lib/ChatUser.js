@@ -71,13 +71,27 @@ ChatUser.prototype.leave = function(req) {
 
 ChatUser.prototype.join = function(req, room) {
   this.leave(req);
-  if( this.isListenRoom(room) ) {
+  if( !this.isListenRoom(room) ) {
     req.io.leave(this.listenPath(room));
-  };
+  }
   this.joinRoom = room;
   this.room = this.model.room(room);
   req.io.join(this.joinRoomPath());
   req.io.emit('room join');
+};
+
+ChatUser.prototype.startListen = function(req, room) {
+  if( !this.isListenRoom(room) ) {
+    this.listenRooms.push(room);
+    req.io.join(this.listenPath(room));
+  }; 
+};
+
+ChatUser.prototype.stopListen = function(req, room) {
+  if( this.isListenRoom(room) ) {
+    this.listenRooms = _.without(this.listenRooms, room);
+    req.io.leave(this.listenPath(room));
+  };
 };
 
 ChatUser.prototype.logMessage = function(message) {

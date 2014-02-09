@@ -10,7 +10,7 @@ exports.get = function(url, cb) {
       if( !res.headers['content-type'] || !res.headers['content-type'].match(/^image\/(?:p?jpeg|gif|png)$/) ) { cb('not supported content type('+res.headers['content-type']+')'); return; }
       var buffer = new Buffer(parseInt(res.headers['content-length']));
       var offset = 0;
-      res.on('data', function(chunk) { chunk.copy(buffer, offset); offset = chunk.length; });
+      res.on('data', function(chunk) { chunk.copy(buffer, offset); offset += chunk.length; });
       res.on('end', function() { cb(null, buffer); });
     }).on('error', function(err) {
       cb('download error('+err+')');

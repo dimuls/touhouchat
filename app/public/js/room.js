@@ -12,8 +12,10 @@ $(document).ready(function() {
     }),
     user: $.cookie('user') || {
       id: null,
-      rooms: ['b'],
-      soundEnabled: false
+      rooms: ['b', 'a', 'rm', 'to', 'c'],
+      soundEnabled: false,
+      writeShortcut: 'ce', // e - enter || ce - ctrl+enter
+      backgroundImage: ''
     },
   }, window.app);
 
@@ -36,15 +38,103 @@ $(document).ready(function() {
     }
   };
 
+  ko.bindingHandlers.arrayValue = {
+    init: function (element, valueAccessor, allBindingsAccessor) {
+      var observableArray = valueAccessor();
+      var allBindings = allBindingsAccessor();
+      var arrayValueRegexp = new RegExp(allBindings.arrayValueRegexp || '^\\w+$');
+      var interceptor = ko.computed({
+        read: function () {
+          return observableArray().join(', ');
+        },
+        write: function (arrayStr) {
+          var array = arrayStr.split(/\s*,\s*/).filter(function(val) { return val.match(arrayValueRegexp) });
+          observableArray(array);
+        }
+      });
+      ko.applyBindingsToNode(element, { value: interceptor });
+    }
+  };
+
+
 
   app.User = function(data) {
     var self = this;
     ko.mapping.fromJS(data, {}, self);
+    self.save = function() {
+      $.cookie('user', ko.mapping.toJS(self));
+    }
     $.each(data, function(key) {
-      self[key].subscribe(function() {
-        $.cookie('user', ko.mapping.toJS(self));
+      self[key].subscribe(function(nv) {
+        self.save();
       });
     });
+
+    self.changingBackground = ko.observable(false);
+
+    self.setBackgroundImage = function() {
+      $('body').css({ 'background-image': 'url('+self.backgroundImage()+')' });
+    };
+
+    self.uploadBackgroundImage = function() {
+      if( !self.changingBackground() ) {
+        $('#inp-params-bkg-img').click();
+      }
+    };
+
+    self.clearBackgroundImage = function() {
+      if( !self.changingBackground() ) {
+        self.backgroundImage('');
+      }
+    }
+
+    self.downloadBackgroundImage = function(url) {
+      self.changingBackground(true);
+      app.api.chat.token.get(function(err, token) {
+        if( err ) { self.changingBackground(false); alert('Не удалось получить токен для загрузки изображения: '+err.msg+'.'); return; }
+        app.api.image.download(self.id(), token, url, function(err, imageData) {
+          self.changingBackground(false); 
+          if( err ) { alert('Не удалось загрузить изображение: '+err.msg+'.'); return; }
+          var image = new app.Image(imageData);
+          self.backgroundImage(image.path());
+          self.setBackgroundImage();
+        }, true);
+      }); 
+    }
+
+    self.backgroundImage.subscribe(function(url) {
+      if( url.match(/^http:\/\//) ) {
+        self.downloadBackgroundImage(url);
+      } else {
+        self.setBackgroundImage();
+      }
+    });
+
+    if( self.backgroundImage() ) {
+      self.setBackgroundImage();
+    }
+
+    $('#inp-params-bkg-img').change(function() {
+      var file = this.files[0];
+      if( !file || !file.size ) {
+      } else if( file.size > app.conf.imageSizeLimit ) {
+        alert('Максимальный размер картинки - 3 Мб.');
+      } else if( !file.type.match('^image/(jpeg|png|gif)$') ) {
+        alert('Поддерживаемы ТОЛЬКО следующие форматы картинок: JPEG, PNG, GIF.');
+      } else {
+        self.changingBackground(true);
+        app.api.chat.token.get(function(err, token) {
+          if( err ) { self.changingBackground(false); alert('Не удалось получить токен для загрузки изображения: '+err.msg+'.'); return; } 
+          app.api.image.upload(self.id(), token, file, function(err, imageData) {
+            self.changingBackground(false); 
+            if( err ) { alert('Не удалось загрузить изображение: '+err.msg+'.'); return; }
+            var image = new app.Image(imageData);
+            self.backgroundImage(image.path());
+            self.setBackgroundImage();
+          });
+        }, true);   
+      }
+    });    
   }
 
 
@@ -64,14 +154,36 @@ $(document).ready(function() {
     self.appGoTo = application.goTo;
 
     self.quote = function() {
-      // TODO
+      var text = self.text();
+      var quotedText = $(text).text().replace(/(\r?\n)\1+/gm, '$1').replace(/^/gm, '>');
+      var oldText = editor.text();
+      if( oldText && oldText.length && !oldText.match(/\n$/) ) {
+        oldText += '\n'
+      }
+      editor.text(oldText + quotedText + '\n');
+      editor.focusTextEnd();
     };
     self.quoteAnswer = function() {
-      // TODO
+      var text = self.text();
+      var quotedText = $(text).text().replace(/(\r?\n)\1+/gm, '$1').replace(/^/gm, '>');
+      var oldText = editor.text();
+      if( oldText && oldText.length && !oldText.match(/\n$/) ) {
+        oldText += '\n'
+      }
+      editor.text(oldText + '>' + self.linkShort() + '\n' + quotedText + '\n');
+      editor.focusTextEnd();
     };
     self.answer = function() {
-      // TODO
+      var oldText = editor.text();
+      if( oldText && oldText.length && !oldText.match(/\n$/) ) {
+        oldText += '\n';
+      }
+      editor.text(oldText + '>' + self.linkShort() + '\n');
+      editor.focusTextEnd();
     };
+    self.linkShort = ko.computed(function() {
+      return '/' + self.id() + '/';
+    });
     self.linkLong = ko.computed(function() {
       return '/' + chat.room().name() + '/' + self.id() + '/';
     });
@@ -98,9 +210,11 @@ $(document).ready(function() {
     var self = this;
     ko.mapping.fromJS(data, {}, self);
     
-    self.remove = function() {
-      editor.removeImage(self);
-    };
+    if( editor ) {
+      self.remove = function() {
+        editor.removeImage(self);
+      };
+    }
 
     self.path = ko.computed(function() {
       var id = self.id();
@@ -116,11 +230,13 @@ $(document).ready(function() {
 
 
 
-  app.Imager = function(editor) {
+  app.Imager = function(editor, user) {
     var self = this;
 
     self.run = function() {
-      $('#inp-imgs').click();
+      if( !user.changingBackground() ) {
+        $('#inp-imgs').click();
+      }
     };
 
     self.adding = ko.observable(false);
@@ -136,7 +252,7 @@ $(document).ready(function() {
     self.addByURL = function(url) {
       app.api.chat.token.get(function(err, token) {
         if( err ) { self.added(); alert('Не удалось получить токен для загрузки изображения: '+err.msg+'.'); return; }
-        app.api.image.download(app.app.user.id(), token, url, function(err, imageData) {
+        app.api.image.download(user.id(), token, url, function(err, imageData) {
           if( err ) { self.added(); alert('Не удалось загрузить изображение: '+err.msg+'.'); return; }
           self.added();
           editor.images.push(new app.Image(imageData, editor));
@@ -147,7 +263,7 @@ $(document).ready(function() {
     self.addByUpload = function(file) {
       app.api.chat.token.get(function(err, token) {
         if( err ) { self.added(); alert('Не удалось получить токен для загрузки изображения: '+err.msg+'.'); return; }
-        app.api.image.upload(app.app.user.id(), token, file, function(err, imageData) {
+        app.api.image.upload(user.id(), token, file, function(err, imageData) {
           if( err ) { self.added(); alert('Не удалось загрузить изображение: '+err.msg+'.'); return; }
           self.added();
           editor.images.push(new app.Image(imageData, editor));
@@ -160,7 +276,7 @@ $(document).ready(function() {
     });
 
     $('#inp-imgs').change(function() {
-      $.map(this.files, function(file) {
+      $.each(this.files, function(i, file) {
         if( !file || !file.size ) {
         } else if( file.size > app.conf.imageSizeLimit ) {
           alert('Максимальный размер картинки - 3 Мб.');
@@ -173,17 +289,25 @@ $(document).ready(function() {
       self.add();
     });
 
+    self.addByURLs = function(urls) {
+      $.each(urls, function(i, url) {
+        self.addQueue.push(function() { self.addByURL(url); });
+      });
+      self.add();
+    }
+
   };
 
 
 
 
 
-  app.Editor = function(chat) {
+  app.Editor = function(chat, user) {
     var self = this;
 
+    self.user = user;
     self.text = ko.observable('');
-    self.imager = new app.Imager(self);
+    self.imager = new app.Imager(self, user);
     self.images = ko.mapping.fromJS([], {
       create: function(opt) { return new app.Image(opt.data, self); },
       key: function(image) { return ko.unwrap(image.id) }
@@ -193,6 +317,9 @@ $(document).ready(function() {
       self.text('');
       self.images.removeAll();
     };
+
+    self._textJqEl = $('#msg-text');
+    self.textCaret = self._textJqEl.caret.bind(self._textJqEl);
 
     self.write = function() {
       app.api.chat.message.write({ text: self.text(), images: ko.mapping.toJS(self.images) }, function(message) {
@@ -207,17 +334,86 @@ $(document).ready(function() {
     self.removeImage = function(image) {
       self.images.remove(image);
     };
+
+    self.focusTextEnd = function() {
+      self.textCaret.caret(-1);
+    };
+
+
+
+    // Shortcuts handling
+
+    self.act = function(action) {
+      switch(action) {
+        case 'write':
+          self.write();
+          return true;
+          break;
+        case 'text new line':
+          self.textCaret('\n');
+          return true;
+          break;
+        default: return false; break;
+      }
+    };
+
+    self._sendKeyShortcutChecker = ko.computed(function() {
+      switch(user.writeShortcut()) {
+        case 'e':
+          return function(e) {
+            if( e.keyCode == 13 || e.keyCode == 10 ) {
+              if( e.ctrlKey || e.metaKey ) {
+                return 'text new line';
+              } else {
+                return 'write';
+              }
+            }
+            return 'pass';
+          };
+          break;
+        case 'ce':
+          return function(e) { return (e.keyCode == 13 || e.keyCode == 10) && (e.ctrlKey || e.metaKey) ? 'write' : 'pass' };
+          break;
+      }
+    });
+    self.sendKeyShortcutChecker = self._sendKeyShortcutChecker();
+    self._sendKeyShortcutChecker.subscribe(function(f) {
+      self.sendKeyShortcutChecker = f;
+    });
+
+    self.shortcutChecker = function(e) {
+      var res = self.sendKeyShortcutChecker(e);
+      if( self.act(res) ) { return; }
+    }
+
+    self.textKeyPressed = function(data, e) {
+      if( self.shortcutChecker(e) ) {
+        return false;
+      }
+      return true;
+    };
+
+
+
+    // Images URL parsing
+
+    /* self.textThrottled = ko.computed(function() {
+      return self.text();
+    }).extend({ throttle: 3000 });
+    self.textThrottled.subscribe(function(text) {
+      self.imager.addByURLs(text.match(/http:\/\/\S+/g));
+    }); */
   };
 
 
 
 
 
-  app.Chat = function(application) {
+  app.Chat = function(application, user) {
     var self = this;
     self.room = application.currentRoom;
     self.activeMessageId = ko.observable();
-    self.editor = new app.Editor(self);
+    self.editor = new app.Editor(self, user);
     self.messages = ko.mapping.fromJS([], {
       create: function(opt) { return new app.Message(opt.data, self, self.editor, application) },
       key: function(message) { return ko.unwrap(message.id) }
@@ -225,7 +421,8 @@ $(document).ready(function() {
     self.addMessage = function(data) {
       if( data.author ) { self.editor.clear(); }
       else {
-        // TODO: sound and tab-header notification
+        application.playMessageSound();
+        $.titleAlert("Новое сообщение!", { requireBlur:false, stopOnFocus:true, duration:0, interval:500 });
       }
       self.messages.push(new app.Message(data, self, self.editor, application));
       if( self.autoScrollEnabled() ) {
@@ -295,7 +492,7 @@ $(document).ready(function() {
     self.nameTxt = ko.computed(function() { return '/'+self.name()+'/' });
     self.current = ko.computed(function() {
       return self === application.currentRoom();
-    });
+   });
     self.newMessagesCount = ko.observable(0);
     self.usersCount = ko.observable(0);
     self.newMessage = function() {
@@ -315,6 +512,10 @@ $(document).ready(function() {
         self.clearCounter();
       }
     });
+    self.listen = {
+      start: app.api.chat.room.listen.start.bind(null, self.name()),
+      stop: app.api.chat.room.listen.stop.bind(null, self.name())
+    };
   }
 
 
@@ -344,7 +545,6 @@ $(document).ready(function() {
     }
 
     self.allRooms = ko.computed(function() {
-
       var rooms = self.rooms();
       var currentRoom = self.currentRoom();
       if( rooms.indexOf(currentRoom) == -1 ) {
@@ -375,11 +575,29 @@ $(document).ready(function() {
     // User and Chat initalizing
 
     self.user = new app.User(app.user);
-    self.chat = new app.Chat(self);
+    self.chat = new app.Chat(self, self.user);
 
     if( app.params.message ) {
       self.chat.activeMessageId(app.params.message);
     }
+
+    self.user.rooms.subscribe(function(newRooms) {
+      self.rooms.removeAll($.grep(self.rooms(), function(room) {
+        if( newRooms.indexOf(room.name()) === -1 && !room.current() ) { room.listen.stop(); return true; }
+        return false;
+      }));
+      $.each(newRooms, function(i, name) {
+        if( self.rooms.mappedIndexOf({ name: name }) === -1 ) {
+          if( self.currentRoom().name() == name ) {
+            self.rooms.push(self.currentRoom());
+          } else {
+            var room = new app.Room(name, self);
+            room.listen.start();
+            self.rooms.push(new app.Room(name, self));
+          }
+        }
+      });
+    });
 
 
 
@@ -389,15 +607,41 @@ $(document).ready(function() {
       
     self.additionalForm = ko.observable(0);
 
-    self.additionalVisible = ko.computed(function() { return self.additionalForm() === 0 });
-    self.helpVisible = ko.computed(function() { return self.additionalForm() === 1; });
     self.settingsVisible = ko.computed(function() { return self.additionalForm() === 2; });
+    self.helpVisible = ko.computed(function() { return self.additionalForm() === 1; });
 
-    self.toggleHelp = function() { self.helpVisible() ? self.additionalForm(0) : self.additionalForm(1); };
     self.toggleSettings = function() { self.settingsVisible() ? self.additionalForm(0) : self.additionalForm(2); };
+    self.toggleHelp = function() { self.helpVisible() ? self.additionalForm(0) : self.additionalForm(1); };
 
     self.toggleSound = function() { self.soundEnabled(!self.soundEnabled()) };
 
+
+
+
+    // Init sound system
+
+    self.soundEnabled = ko.observable(true);
+    self.toggleSound = function() {
+      self.soundEnabled(!self.soundEnabled());
+    }
+    self.playMessageSound = function () {};
+    soundManager.setup({
+      url: '/swf/soundmanager/',
+      preferFlash: false,
+      debugMode: false,
+      onready: function() {
+        var messageSound = soundManager.createSound({
+          id: 'message',
+          url: '/sfx/message.ogg',
+          autoLoad: true,
+          autoPlay: false,
+          volume: 50
+        }); 
+        self.playMessageSound = function () {
+          self.soundEnabled() && messageSound.play();
+        };
+      }
+    });
 
 
 
@@ -429,6 +673,9 @@ $(document).ready(function() {
       var path = window.location.pathname;
       self._loadPath(path);
     };
+
+
+
 
 
     // Initializing

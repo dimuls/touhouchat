@@ -35,8 +35,8 @@ $(document).ready(function() {
         },
         download: function(userId, token, url, cb) {
           var data = new FormData();
-          dara.append('userId', userId);
-          dara.append('token', token);
+          data.append('userId', userId);
+          data.append('token', token);
           data.append('url', url);
           $.ajax({
             url: app.url.image.download,

@@ -40,8 +40,8 @@ block content
           .msg-txt(data-bind="html: text, applyBindings")
     .row.edtr(data-bind="with: editor")
       .edtr-row
-        textarea.txt-blk.txt-blk-edtr-msg(data-bind="value: text", placeholder="Введите Ваше сообщение", onfocus="this.placeholder = ''", onblur="this.placeholder = 'Введите Ваше сообщение'" )
-        .btn.btn-icon.icon-image.btn-edtr-img(data-bind="click: imager.run, css:{ 'btn-dsbld': imager.adding }")
+        textarea.txt-blk.txt-blk-edtr-msg#msg-text(data-bind="value: text, valueUpdate: 'afterkeydown', event: { keypress: textKeyPressed }", placeholder="Введите Ваше сообщение", onfocus="this.placeholder = ''", onblur="this.placeholder = 'Введите Ваше сообщение'" )
+        .btn.btn-icon.icon-image.btn-edtr-img(data-bind="click: imager.run, css:{ 'btn-dsbld': imager.adding() || user.changingBackground() }")
         input(tabindex="-1", accept="image/*", id="inp-imgs", type="file", multiple)
       .edtr-row.edtr-row-imgs.imgs-tbnls(data-bind="visible: images().length")
         .imgs-tbnls-in(data-bind="foreach: images, hscroll")
@@ -51,39 +51,77 @@ block content
         .btn.btn-wht(data-bind="click: clear, css:{ 'btn-dsbld': imager.adding }") Очистить
         .btn.pll-rght(data-bind="click: write, css:{ 'btn-dsbld': imager.adding }") Написать
   .col-cnt
-    .col.col-w3(data-bind="visible: additionalVisible")
+    .col.col-w3
       .row.row-rms
-        .btn.btn-rm(data-bind="click: toggleSettings") Параметры
-        .btn.btn-rm(data-bind="click: toggleHelp") Справка
+        .btn.btn-rm.btn-tgl(data-bind="click: toggleSettings, css: { actv: settingsVisible }") Параметры
+        .btn.btn-rm.btn-tgl(data-bind="click: toggleHelp, css: { actv: helpVisible }") Справка
       .col-hr
       .row.row-rms(data-bind="foreach: allRooms")
         .btn.btn-rm(data-bind="css: { actv: current }, click: goTo")
           span(data-bind="text: nameTxt")
           span.new-msg-cnt(data-bind="visible: newMessagesCount, text: '('+newMessagesCount()+')'")
           
-    .col.col-w3.col-add(data-bind="visible: settingsVisible")
+    .col.col-w3.col-add.col-params(data-bind="visible: settingsVisible")
       .col-hdr.col-hdr-scnd
         Параметры
         .btn.btn-wht.btn-close(data-bind="click: toggleSettings") ×
       .col-hr
+      .col-lbl Список комнат ( через запятую ):
+      input.txt-blk.txt-params-rms(data-bind="arrayValue: user.rooms, arrayValueRegexp: '^\\\\w*[A-Za-z_]\\\\w*$'", placeholder="Введите список комнат")
+      .col-lbl Отправка сообщений по:
+      .btn(data-bind="css: { actv: user.writeShortcut() == 'ce' }, click: user.writeShortcut.bind($data, 'ce');") Сtrl(Cmd)+Enter
+      .sps-5px
+      .btn(data-bind="css: { actv: user.writeShortcut() == 'e' }, click: user.writeShortcut.bind($data, 'e');") Enter
+      .col-lbl Фон:
+      .nowrap
+        input.txt-blk.txt-params-bkgimg(data-bind="value: user.backgroundImage, enable: !user.changingBackground(), css: { 'txt-dsbld': user.changingBackground() }", placeholder="Введите URL изображения")
+        input(tabindex="-1", accept="image/*", id="inp-params-bkg-img", type="file")
+        .sps-5px
+        .btn(data-bind="click: user.uploadBackgroundImage, css: { 'btn-dsbld': user.changingBackground() }") ...
+        .sps-5px
+        .btn(data-bind="click: user.backgroundImage.bind($data, ''), css: { 'btn-dsbld': !user.backgroundImage() || user.changingBackground() }") ×
+
     .col.col-w3.col-add(data-bind="visible: helpVisible")
       .col-hdr.col-hdr-scnd
         Справка
         .btn.btn-wht.btn-close(data-bind="click: toggleHelp") ×
       .col-hr
-//    .col.col-w3.col-add(data-bind="visible: imagesVisible")
-//      .col-hdr.col-hdr-scnd
-//        Изображения
-//        .btn.btn-wht.btn-close(data-bind="click: toggleImages") ×
-//      .col-hr
+      .col-lbl Быстрые клавиши:
+      ul.col-hlp
+        li.col-hlp-itm Ctrl+Enter(Cmd+Enter) - написать
+      .col-lbl Разметка в пределах строки:
+      ul.col-hlp
+        li.col-hlp-itm <strong>**жирный**</strong>
+        li.col-hlp-itm <em>*наклонный*</em>
+        li.col-hlp-itm <q>&gt;цитата</q>
+
+      .col-lbl Ссылки:
+      ul.col-hlp
+        li.col-hlp-itm /<em>&lt;room&gt;</em>/
+        li.col-hlp-itm /<em>&lt;post&gt;</em>/
+        li.col-hlp-itm /<em>&lt;room&gt;</em>/<em>&lt;post&gt;</em>/
+      .col-lbl Ограничения:
+      ul.col-hlp
+        li.col-hlp-itm <em>&lt;room&gt;</em> - имя комнаты может состоять только из символов A-Z a-z 0-9 _ и должен содержать хотябы один символ не цифру A-Z a-z _
+        li.col-hlp-itm <em>&lt;post&gt;</em> - номер поста может состоять только из цифр 0-9
+      .col-lbl Комнаты:
+      ul.col-hlp
+        li.col-hlp-itm в настройках можно определить список комнат
+      .col-lbl Лог сообщений:
+      ul.col-hlp
+        li.col-hlp-itm сохраняется только для комнаты /<em>b</em>/
+        li.col-hlp-itm для остальных комнат стирается после ухода последнего участника
 
 block script
   script(type='text/javascript', src="/socket.io/socket.io.js")
+  script(type='text/javascript', src="/js/lib/soundmanager.js")
   script(type='text/javascript', src="/js/lib/jquery.js")
   script(type='text/javascript', src="/js/lib/jquery/cookie.js")
   script(type='text/javascript', src="/js/lib/jquery/scrollTo.js")
   script(type='text/javascript', src="/js/lib/jquery/debounce.js")
   script(type='text/javascript', src="/js/lib/jquery/mousewheel.js")
+  script(type='text/javascript', src="/js/lib/jquery/caret.js")
+  script(type='text/javascript', src="/js/lib/jquery/titlealert.js")
   script(type='text/javascript', src="/js/lib/knockout.js")
   script(type='text/javascript', src="/js/lib/knockout/mapping.js")
   script(type='text/javascript', src="/js/api/image.js")
