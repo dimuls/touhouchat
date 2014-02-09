@@ -12,12 +12,17 @@ paths:
 	mkdir -p $(PROJECT_PATH)
 	mkdir -p $(SITES_PATH)/logs/$(APP_NAME)
 	mkdir -p $(PROJECT_PATH)/upload/img/
+	mkdir -p $(SITES_PATH)/.forever
+	bash ./scripts/makeImgPaths.sh $(PROJECT_PATH)/upload/img/
+	chown -R node:www-data $(PROJECT_PATH)
+	chown -R node:node $(SITES_PATH)/logs/$(APP_NAME)
+	chown -R node:node $(SITES_PATH)/.forever
 
 stop:
-	su -l $(APP_USER) -c 'NODE_ENV=production forever stop --sourceDir $(PROJECT_PATH) app.js'
+	su -l $(APP_USER) -c 'NODE_ENV=production forever stop -p $(PROJECT_PATH)/.forever/ --sourceDir $(PROJECT_PATH) app.js'
 
 start:
-	su -l $(APP_USER) -c 'NODE_ENV=production forever start --sourceDir $(PROJECT_PATH) -l $(LOG_PATH)/forever.log -o $(LOG_PATH)/app.log -e $(LOG_PATH)/app-error.log -a app.js'
+	su -l $(APP_USER) -c 'NODE_ENV=production forever start -p $(PROJECT_PATH)/.forever/ --sourceDir $(PROJECT_PATH) -l $(LOG_PATH)/forever.log -o $(LOG_PATH)/app.log -e $(LOG_PATH)/app-error.log -a app.js'
 
 restart:
 	make stop
@@ -34,11 +39,13 @@ deploy_app_static:
 
 deploy_app:
 	-make stop
-	rm -rf $(PROJECT_PATH)/node_modules $(PROJECT_PATH)/lib $(PROJECT_PATH)/model $(PROJECT_PATH)/app.js $(PROJECT_PATH)/config.js
+	rm -rf $(PROJECT_PATH)/node_modules $(PROJECT_PATH)/lib $(PROJECT_PATH)/model $(PROJECT_PATH)/app.js $(PROJECT_PATH)/config.js $(PROJECT_PATH)/routes $(PROJECT_PATH)/views
 	cp -R ./app/node_modules $(PROJECT_PATH)
 	cp -R ./app/lib $(PROJECT_PATH)
 	cp -R ./app/model $(PROJECT_PATH)
 	cp -R ./app/public $(PROJECT_PATH)
+	cp -R ./app/routes $(PROJECT_PATH)
+	cp -R ./app/views $(PROJECT_PATH)
 	cp ./app/app.js $(PROJECT_PATH)
 	cp ./app/config.js $(PROJECT_PATH)
 	make deploy_app_static
