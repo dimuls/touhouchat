@@ -1,11 +1,11 @@
 extends layout
 
 block title
-  | anonchat.pw/#{room}/
+  title(data-bind="text: 'anonchat.pw/'+currentRoom().name()+'/'")
 
 block style
   link(href='http://fonts.googleapis.com/css?family=Play&subset=latin,cyrillic-ext,cyrillic,latin-ext', rel='stylesheet', type='text/css')
-  link(rel="stylesheet", href="/css/room.css")
+  link(rel="stylesheet", href="/css/room.css?v=1")
 
 block content
   .col.col-w5.col-cht(data-bind="with: chat")
@@ -53,7 +53,7 @@ block content
   .col-cnt
     .col.col-w3
       .row.row-rms
-        .btn.btn-rm.btn-tgl(data-bind="click: toggleSettings, css: { actv: settingsVisible }") Параметры
+        .btn.btn-rm.btn-tgl(data-bind="click: toggleSettings, css: { actv: settingsVisible }") Настройки
         .btn.btn-rm.btn-tgl(data-bind="click: toggleHelp, css: { actv: helpVisible }") Справка
       .col-hr
       .row.row-rms(data-bind="foreach: allRooms")
@@ -63,7 +63,7 @@ block content
           
     .col.col-w3.col-add.col-params(data-bind="visible: settingsVisible")
       .col-hdr.col-hdr-scnd
-        Параметры
+        Настройки
         .btn.btn-wht.btn-close(data-bind="click: toggleSettings") ×
       .col-hr
       .col-lbl Список комнат ( через запятую ):
@@ -72,7 +72,7 @@ block content
       .btn(data-bind="css: { actv: user.writeShortcut() == 'ce' }, click: user.writeShortcut.bind($data, 'ce');") Сtrl(Cmd)+Enter
       .sps-5px
       .btn(data-bind="css: { actv: user.writeShortcut() == 'e' }, click: user.writeShortcut.bind($data, 'e');") Enter
-      .col-lbl Фон:
+      .col-lbl Фоновое изображение:
       .nowrap
         input.txt-blk.txt-params-bkgimg(data-bind="value: user.backgroundImage, enable: !user.changingBackground(), css: { 'txt-dsbld': user.changingBackground() }", placeholder="Введите URL изображения")
         input(tabindex="-1", accept="image/*", id="inp-params-bkg-img", type="file")
@@ -86,31 +86,35 @@ block content
         Справка
         .btn.btn-wht.btn-close(data-bind="click: toggleHelp") ×
       .col-hr
-      .col-lbl Быстрые клавиши:
-      ul.col-hlp
-        li.col-hlp-itm Ctrl+Enter(Cmd+Enter) - написать
-      .col-lbl Разметка в пределах строки:
-      ul.col-hlp
-        li.col-hlp-itm <strong>**жирный**</strong>
-        li.col-hlp-itm <em>*наклонный*</em>
-        li.col-hlp-itm <q>&gt;цитата</q>
+      .col-hlp-cnt
+        .col-lbl Доступные настройки:
+        ul.col-hlp
+          li.col-hlp-itm Список комнат
+          li.col-hlp-itm Быстрая клавиша для отправки сообщения
+          li.col-hlp-itm Фоновое изображения
 
-      .col-lbl Ссылки:
-      ul.col-hlp
-        li.col-hlp-itm /<em>&lt;room&gt;</em>/
-        li.col-hlp-itm /<em>&lt;post&gt;</em>/
-        li.col-hlp-itm /<em>&lt;room&gt;</em>/<em>&lt;post&gt;</em>/
-      .col-lbl Ограничения:
-      ul.col-hlp
-        li.col-hlp-itm <em>&lt;room&gt;</em> - имя комнаты может состоять только из символов A-Z a-z 0-9 _ и должен содержать хотябы один символ не цифру A-Z a-z _
-        li.col-hlp-itm <em>&lt;post&gt;</em> - номер поста может состоять только из цифр 0-9
-      .col-lbl Комнаты:
-      ul.col-hlp
-        li.col-hlp-itm в настройках можно определить список комнат
-      .col-lbl Лог сообщений:
-      ul.col-hlp
-        li.col-hlp-itm сохраняется только для комнаты /<em>b</em>/
-        li.col-hlp-itm для остальных комнат стирается после ухода последнего участника
+        .col-lbl Быстрые клавиши:
+        ul.col-hlp
+          li.col-hlp-itm Ctrl+Enter(Cmd+Enter) или Enter - написать
+          li.col-hlp-itm Shift+Scroll - вертикальная прокрутка строки изображений
+        .col-lbl Разметка в пределах строки:
+        ul.col-hlp
+          li.col-hlp-itm <strong>**жирный**</strong>
+          li.col-hlp-itm <em>*наклонный*</em>
+          li.col-hlp-itm <q>&gt;цитата</q>
+        .col-lbl Ссылки:
+        ul.col-hlp
+          li.col-hlp-itm /<em>&lt;room&gt;</em>/
+          li.col-hlp-itm /<em>&lt;post&gt;</em>/
+          li.col-hlp-itm /<em>&lt;room&gt;</em>/<em>&lt;post&gt;</em>/
+        .col-lbl Ограничения:
+        ul.col-hlp
+          li.col-hlp-itm <em>&lt;room&gt;</em> - имя комнаты может состоять только из символов A-Z a-z 0-9 _ и должен содержать хотябы один символ не цифру A-Z a-z _
+          li.col-hlp-itm <em>&lt;post&gt;</em> - номер поста может состоять только из цифр 0-9
+        .col-lbl Лог сообщений:
+        ul.col-hlp
+          li.col-hlp-itm сохраняется только для комнаты /<em>b</em>/
+          li.col-hlp-itm для остальных комнат стирается после ухода последнего участника
 
 block script
   script(type='text/javascript', src="/socket.io/socket.io.js")
@@ -139,6 +143,6 @@ block script
         }
       }, window.app);
     });
-  script(type='text/javascript', src="/js/room.js")
+  script(type='text/javascript', src="/js/room.js?v=1")
   <!-- Yandex.Metrika counter --><script type="text/javascript">(function (d, w, c) { (w[c] = w[c] || []).push(function() { try { w.yaCounter21782987 = new Ya.Metrika({id:21782987, clickmap:true, trackLinks:true, accurateTrackBounce:true, trackHash:true, ut:"noindex"}); } catch(e) { } }); var n = d.getElementsByTagName("script")[0], s = d.createElement("script"), f = function () { n.parentNode.insertBefore(s, n); }; s.type = "text/javascript"; s.async = true; s.src = (d.location.protocol == "https:" ? "https:" : "http:") + "//mc.yandex.ru/metrika/watch.js"; if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); } })(document, window, "yandex_metrika_callbacks");</script><noscript><div><img src="//mc.yandex.ru/watch/21782987?ut=noindex" style="position:absolute; left:-9999px;" alt="" /></div></noscript><!-- /Yandex.Metrika counter -->
 

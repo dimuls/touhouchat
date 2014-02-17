@@ -16,6 +16,7 @@ module.exports = {
             userLogin: { time: 60, count: 50, path: 'user/login' }
   },
   paths: {
-    messageImages:  __dirname+'/upload/img/'  // '/sites/anonchat.pw/upload/img/'
-  }
+    messageImages: __dirname+'/upload/img/'  // '/sites/anonchat.pw/upload/img/'
+  },
+  secret: 'asdqwodj109018fh0w8efhq9p3agh08g3h'
 };

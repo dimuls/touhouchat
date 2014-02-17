@@ -15,7 +15,8 @@ $(document).ready(function() {
       rooms: ['b', 'a', 'rm', 'to', 'c'],
       soundEnabled: false,
       writeShortcut: 'ce', // e - enter || ce - ctrl+enter
-      backgroundImage: ''
+      backgroundImage: '/img/default-background.jpg',
+      helpVisible: true
     },
   }, window.app);
 
@@ -24,8 +25,10 @@ $(document).ready(function() {
   ko.bindingHandlers.hscroll = {
     init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
       $(element).mousewheel(function(event) {
-        this.scrollLeft -= (event.deltaY * event.deltaFactor);      
-        event.preventDefault();
+        if( event.shiftKey ) {
+          this.scrollLeft -= (event.deltaY * event.deltaFactor);      
+          event.preventDefault();
+        }
       });
     }
   };
@@ -420,9 +423,9 @@ $(document).ready(function() {
     });
     self.addMessage = function(data) {
       if( data.author ) { self.editor.clear(); }
-      else {
+      else if( !application.windowFocused() ) {
         application.playMessageSound();
-        $.titleAlert("Новое сообщение!", { requireBlur:false, stopOnFocus:true, duration:0, interval:500 });
+        $.titleAlert("Новое сообщение!", { requireBlur:false, stopOnFocus:true, stopOnMouseMove: true, duration:0, interval:500 });
       }
       self.messages.push(new app.Message(data, self, self.editor, application));
       if( self.autoScrollEnabled() ) {
@@ -605,15 +608,27 @@ $(document).ready(function() {
 
     // Additional forms
       
-    self.additionalForm = ko.observable(0);
+    self.additionalForm = ko.observable(self.user.helpVisible() ? 1 : 0);
 
     self.settingsVisible = ko.computed(function() { return self.additionalForm() === 2; });
     self.helpVisible = ko.computed(function() { return self.additionalForm() === 1; });
+    self.helpVisible.subscribe(function(visible) { self.user.helpVisible(visible); });
 
     self.toggleSettings = function() { self.settingsVisible() ? self.additionalForm(0) : self.additionalForm(2); };
     self.toggleHelp = function() { self.helpVisible() ? self.additionalForm(0) : self.additionalForm(1); };
 
     self.toggleSound = function() { self.soundEnabled(!self.soundEnabled()) };
+
+
+
+
+    // Window focus/blur
+    self.windowFocused = ko.observable(true);
+    $(window).bind("focus",function(event) {
+      self.windowFocused(true);
+    }).bind("blur", function(event) {
+      self.windowFocused(false);
+    });
 
 
 
@@ -716,5 +731,5 @@ $(document).ready(function() {
 
 
   app.app = new app.App();
-  ko.applyBindings(app.app);
+  ko.applyBindings(app.app, $('html')[0]);
 });

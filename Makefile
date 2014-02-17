@@ -15,7 +15,7 @@ paths:
 	mkdir -p $(SITES_PATH)/.forever
 	bash ./scripts/makeImgPaths.sh $(PROJECT_PATH)/upload/img/
 	chown -R node:www-data $(PROJECT_PATH)
-	chown -R node:node $(SITES_PATH)/logs/$(APP_NAME)
+	chown -R node:node $(LOG_PATH)
 	chown -R node:node $(SITES_PATH)/.forever
 
 stop:

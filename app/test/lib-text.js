@@ -11,14 +11,14 @@ http://anonchat.pw/b/123/\n\
 /rm/123/';
 
 var testStrRes = '\
-<p><a href="http://anonchat.pw/">http://anonchat.pw/</a></p>\
-<p><a href="http://anonchat.pw/b/">http://anonchat.pw/b/</a></p>\
-<p><a href="http://anonchat.pw/b/123/">http://anonchat.pw/b/123/</a></p>\
-<p><a href="/b/" data-bind="click: $root.chat.changeRoom.bind($data, \'b\')">/b/</a></p>\
-<p><a href="/b/123/" data-bind="click: $root.chat.changeRoom.bind($data, \'b\', \'123\')">/123/</a></p>\
-<p><a href="/b/123/" data-bind="click: $root.chat.changeRoom.bind($data, \'b\', \'123\')">/123/</a></p>\
-<p><a href="/rm/" data-bind="click: $root.chat.changeRoom.bind($data, \'rm\')">/rm/</a></p>\
-<p><a href="/rm/123/" data-bind="click: $root.chat.changeRoom.bind($data, \'rm\', \'123\')">/rm/123/</a></p>';
+<p><a target="_blank" href="http://anonchat.pw/">http://anonchat.pw/</a></p>\
+<p><a target="_blank" href="http://anonchat.pw/b/">http://anonchat.pw/b/</a></p>\
+<p><a target="_blank" href="http://anonchat.pw/b/123/">http://anonchat.pw/b/123/</a></p>\
+<p><a href="/b/" data-bind="click: appGoTo.bind($data, \'/b/\')">/b/</a></p>\
+<p><a href="/b/123/" data-bind="click: appGoTo.bind($data, \'/b/123/\')">/123/</a></p>\
+<p><a href="/b/123/" data-bind="click: appGoTo.bind($data, \'/b/123/\')">/123/</a></p>\
+<p><a href="/rm/" data-bind="click: appGoTo.bind($data, \'/rm/\')">/rm/</a></p>\
+<p><a href="/rm/123/" data-bind="click: appGoTo.bind($data, \'/rm/123/\')">/rm/123/</a></p>';
 
 exports['right urls parsing'] = function(t) {
   t.expect(1);

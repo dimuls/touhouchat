@@ -21,7 +21,7 @@ app.use(express.json());
 app.use(express.urlencoded());
 app.use(express.methodOverride());
 app.use(express.cookieParser());
-app.use(express.session({ secret: 'asdqwodj109018fh0w8efhq9p3agh08g3h' }));
+app.use(express.session({ secret: config.secret }));
 app.use(express.multipart({ limit: '5mb' }));
 app.use(app.router);
 app.use(require('stylus').middleware(path.join(__dirname, 'public')));
