@@ -20,6 +20,15 @@ $(document).ready(function() {
     },
   }, window.app);
 
+  if( !app.user.backgroundImage && app.user.backgroundImage !== '' ) { 
+    app.user.backgroundImage = '/img/default-background.jpg';
+  }
+
+  if( !app.user.helpVisible && app.user.helpVisible !== false ) { 
+    app.user.helpVisible = true;
+  }
+
+
   app.api.chat._init();
 
   ko.bindingHandlers.hscroll = {
