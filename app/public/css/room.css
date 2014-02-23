@@ -14,7 +14,7 @@ body {
 }
 body {
   padding: 10px;
-  text-align: left;
+  text-align: center;
   white-space: nowrap;
   background-repeat: no-repeat;
   background-size: cover;
@@ -217,14 +217,37 @@ q {
   background-attachment: local !important;
 }
 .btn.btn-rm {
-  margin-right: 5px;
+  border-radius: 0 5px 5px 0;
+  border-left: 0;
+  border: 0;
+  position: relative;
+  z-index: 50;
+  margin-bottom: 5px;
+  background: #d3d3d3;
+  color: #333;
 }
-.btn.btn-rm:last-child {
-  margin-right: 0;
+.btn.btn-rm.actv:hover {
+  z-index: 100;
+}
+.btn.btn-rm.actv {
+  z-index: 100;
+}
+.btn.btn-rm:active,
+.btn.btn-rm:hover {
+  border: 0;
+  padding: 5px;
+  z-index: 99;
+}
+.btn.btn-rm:active {
+  background: #fff;
+}
+.btn.btn-rm.actv {
+  background-image: url("/img/bg-1.png");
+  padding: 5px;
 }
 .btn.btn-close {
   position: absolute;
-  right: 10px;
+  left: 10px;
   top: 10px;
   height: 24px;
   width: 24px;
@@ -248,7 +271,6 @@ q {
 }
 .btn.btn-edtr-img {
   height: 100px;
-  margin-left: 5px;
   vertical-align: top;
 }
 doesnotexist:-o-prefocus,
@@ -299,7 +321,8 @@ doesnotexist:-o-prefocus,
   cursor: default;
 }
 .txt-blk.txt-blk-edtr-msg {
-  width: 446px;
+  vertical-align: top;
+  width: 100%;
   height: 100px;
   line-height: 20px;
   font-size: 16px;
@@ -312,7 +335,25 @@ doesnotexist:-o-prefocus,
   width: 100%;
 }
 .txt-blk.txt-params-bkgimg {
-  width: 230px;
+  width: 100%;
+}
+.txt-blk-edtr-msg-wrapper {
+  display: inline-block;
+  width: 100%;
+  padding-right: 39px;
+}
+.txt-blk-edtr-msg-btns {
+  display: inline-block;
+  margin-left: -29px;
+}
+.txt-params-bkgimg-wrapper {
+  display: inline-block;
+  width: 100%;
+  padding-right: 50px;
+}
+.txt-params-bkgimg-btns {
+  display: inline-block;
+  margin-left: -50px;
 }
 .col {
   white-space: normal;
@@ -326,7 +367,6 @@ doesnotexist:-o-prefocus,
   -o-box-sizing: border-box;
   padding: 10px;
   width: 400px;
-  margin-right: 10px;
   background-image: url("/img/bg-1.png");
   box-shadow: 0 0 5px #000;
   border-radius: 5px;
@@ -344,9 +384,9 @@ doesnotexist:-o-prefocus,
   width: 500px;
 }
 .col.col-w6 {
-  width: 600x p;
+  width: 600px;
 }
-.col .col-hdr {
+.col .row-hdr {
   height: 60px;
   line-height: 60px;
   text-align: center;
@@ -355,31 +395,29 @@ doesnotexist:-o-prefocus,
   color: #222;
   cursor: default;
 }
-.col .col-hdr a,
-.col .col-hdr span {
+.col .row-hdr a,
+.col .row-hdr span {
   color: #222;
   text-decoration: none;
 }
-.col .col-hdr.col-hdr-scnd {
+.col .row-hdr.row-hdr-scnd {
   font-size: 24px;
   line-height: 35px;
   height: 35px;
 }
-.col .col-lbl {
+.col .row-lbl {
   font-size: 16px;
   padding: 5px 0;
   margin-top: 5px;
 }
-.col .col-lbl:first-child {
+.col .row-lbl:first-child {
   margin-top: 0;
 }
-.col .col-hlp {
+.col .hlp {
   font-size: 14px;
   padding-left: 15px;
 }
-.col .col-hlp-cnt {
-  max-height: 300px;
-  overflow-y: scroll;
+.col .hlp-cnt {
   padding-right: 5px;
 }
 .col .row {
@@ -392,7 +430,7 @@ doesnotexist:-o-prefocus,
   line-height: 35px;
   text-align: center;
 }
-.col .col-hr {
+.col .row-hr {
   display: block;
   margin: 7px 0 10px 0;
   height: 1px;
@@ -401,6 +439,7 @@ doesnotexist:-o-prefocus,
 .col-cht {
   height: 100%;
   min-height: 600px;
+  z-index: 100;
 }
 .col-cht .msgs {
   position: absolute;
@@ -529,4 +568,70 @@ doesnotexist:-o-prefocus,
   line-height: 6px;
   vertical-align: super;
   margin-left: 2px;
+}
+.row-hdr-btns {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+.hdr-btn {
+  display: inline-block;
+  padding: 3px 5px;
+  background: rgba(255,255,255,0.6);
+  font-size: 12px;
+  border: 1px solid #d3d3d3;
+  cursor: pointer;
+  margin-left: -1px;
+  position: relative;
+  z-index: 500;
+}
+.hdr-btn:last-child {
+  border-radius: 0 5px 0 0;
+}
+.hdr-btn:first-child {
+  border-radius: 0 0 0 5px;
+}
+.hdr-btn:hover {
+  box-shadow: 0 0 2px #808080;
+  background: #fff;
+  border: 1px solid #808080;
+  z-index: 1000;
+}
+.hdr-btn.actv,
+.hdr-btn:active {
+  z-index: 900;
+  border: 1px solid #808080;
+  background: #d3d3d3;
+}
+.row-add {
+  background-image: url("/img/bg-1.png");
+  position: absolute;
+  z-index: 100;
+  left: 10px;
+  right: 10px;
+  padding-bottom: 10px;
+}
+.row-hlp {
+  position: absolute;
+  right: 10px;
+  left: 10px;
+  top: 10px;
+  bottom: 10px;
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+.row-hlp-cnt {
+  position: absolute;
+  top: 78px;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.panel {
+  display: inline-block;
+  position: absolute;
+  text-align: left;
+  margin-top: 70px;
 }

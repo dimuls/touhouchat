@@ -5,14 +5,83 @@ block title
 
 block style
   link(href='http://fonts.googleapis.com/css?family=Play&subset=latin,cyrillic-ext,cyrillic,latin-ext', rel='stylesheet', type='text/css')
-  link(rel="stylesheet", href="/css/room.css?v=1")
+  link(rel="stylesheet", href="/css/room.css?v=3")
+
+ 
+  
 
 block content
-  .col.col-w5.col-cht(data-bind="with: chat")
-    .col-hdr
+  .col.col-w6.col-cht
+    .row-hdr-btns
+      .hdr-btn(data-bind="click: $root.toggleSettings, css: { actv: $root.settingsVisible }") Настройки
+      .hdr-btn(data-bind="click: $root.toggleHelp, css: { actv: $root.helpVisible }") Справка
+
+    .row.row-add.row-hlp(data-bind="visible: helpVisible")
+      .row-hdr
+        Справка
+        .btn.btn-wht.btn-close(data-bind="click: toggleHelp") ×
+      .row-hr
+      .row-hlp-cnt
+        .row-lbl Доступные настройки:
+        ul.hlp
+          li.hlp-itm Список комнат
+          li.hlp-itm Быстрая клавиша для отправки сообщения
+          li.hlp-itm Фоновое изображения
+        .row-lbl Быстрые клавиши:
+        ul.hlp
+          li.hlp-itm Ctrl+Enter(Cmd+Enter) или Enter - написать
+          li.hlp-itm Shift+Scroll - вертикальная прокрутка строки изображений
+        .row-lbl Разметка в пределах строки:
+        ul.hlp
+          li.hlp-itm <strong>**жирный**</strong>
+          li.hlp-itm <em>*наклонный*</em>
+          li.hlp-itm <q>&gt;цитата</q>
+        .row-lbl Ссылки:
+        ul.hlp
+          li.hlp-itm /<em>&lt;room&gt;</em>/
+          li.hlp-itm /<em>&lt;post&gt;</em>/
+          li.hlp-itm /<em>&lt;room&gt;</em>/<em>&lt;post&gt;</em>/
+        .row-lbl Ограничения:
+        ul.hlp
+          li.hlp-itm <em>&lt;room&gt;</em> - имя комнаты может состоять только из символов A-Z a-z 0-9 _ и должен содержать хотябы один символ не цифру A-Z a-z _
+          li.hlp-itm <em>&lt;post&gt;</em> - номер поста может состоять только из цифр 0-9
+        .row-lbl Комнаты:
+        ul.hlp
+          li.hlp-itm Любой пользователь может создать комнату
+          li.hlp-itm Для создания комнаты достаточно войти в неё по адресу http://anonchat.pw/<имя_комнаты>/
+          li.hlp-itm Комнату можно добавить в список комнат в настройках для быстрого доступа
+        .row-lbl Лог сообщений:
+        ul.hlp
+          li.hlp-itm сохраняется только для комнаты /<em>b</em>/
+          li.hlp-itm для остальных комнат стирается после ухода последнего участника
+
+
+    .row.row-add(data-bind="visible: settingsVisible")
+      .row-hdr
+        Настройки
+        .btn.btn-wht.btn-close(data-bind="click: toggleSettings") ×
+      .row-hr
+      .row-lbl Список комнат ( через запятую ):
+      input.txt-blk.txt-params-rms(data-bind="arrayValue: user.rooms, arrayValueRegexp: '^\\\\w*[A-Za-z_]\\\\w*$'", placeholder="Введите список комнат")
+      .row-lbl Отправка сообщений по:
+      .btn(data-bind="css: { actv: user.writeShortcut() == 'ce' }, click: user.writeShortcut.bind($data, 'ce');") Сtrl(Cmd)+Enter
+      .sps-5px
+      .btn(data-bind="css: { actv: user.writeShortcut() == 'e' }, click: user.writeShortcut.bind($data, 'e');") Enter
+      .row-lbl Фоновое изображение:
+      .nowrap
+        .txt-params-bkgimg-wrapper
+          input.txt-blk.txt-params-bkgimg(data-bind="value: user.backgroundImage, enable: !user.changingBackground(), css: { 'txt-dsbld': user.changingBackground() }", placeholder="Введите URL изображения")
+        input(tabindex="-1", accept="image/*", id="inp-params-bkg-img", type="file")
+        .txt-params-bkgimg-btns
+          .sps-5px
+          .btn(data-bind="click: user.uploadBackgroundImage, css: { 'btn-dsbld': user.changingBackground() }") ...
+          .sps-5px
+          .btn(data-bind="click: user.backgroundImage.bind($data, ''), css: { 'btn-dsbld': !user.backgroundImage() || user.changingBackground() }") ×
+    .row-hdr
       a(href="http://anonchat.pw") anonchat.pw
-      span(data-bind="text: room().path()")
-    .row.msgs(data-bind="foreach: messages, style: { bottom: editor.images().length ? '221px' : '161px'  }")
+      span(data-bind="text: chat.room().path()")
+
+    .row.msgs(data-bind="foreach: chat.messages, style: { bottom: chat.editor.images().length ? '221px' : '161px'  }")
       .msg(data-bind="css: { 'msg-actv': active }, attr: { id: 'msg-'+id() }")
         .msg-hdr
           strong
@@ -38,10 +107,13 @@ block content
               .imgs-tbnls-in(data-bind="foreach: images, hscroll")
                 a.img-tbnl(data-bind="style: { backgroundImage: 'url('+thumbnailPath()+')' }, attr: { href: path }", target="_blank")
           .msg-txt(data-bind="html: text, applyBindings")
-    .row.edtr(data-bind="with: editor")
+    .row.edtr(data-bind="with: chat.editor")
       .edtr-row
-        textarea.txt-blk.txt-blk-edtr-msg#msg-text(data-bind="value: text, valueUpdate: 'afterkeydown', event: { keypress: textKeyPressed }", placeholder="Введите Ваше сообщение", onfocus="this.placeholder = ''", onblur="this.placeholder = 'Введите Ваше сообщение'" )
-        .btn.btn-icon.icon-image.btn-edtr-img(data-bind="click: imager.run, css:{ 'btn-dsbld': imager.adding() || user.changingBackground() }")
+        .txt-blk-edtr-msg-wrapper
+          textarea.txt-blk.txt-blk-edtr-msg#msg-text(data-bind="value: text, valueUpdate: 'afterkeydown', event: { keypress: textKeyPressed }", placeholder="Введите Ваше сообщение", onfocus="this.placeholder = ''", onblur="this.placeholder = 'Введите Ваше сообщение'" )
+        
+        .txt-blk-edtr-msg-btns
+          .btn.btn-icon.icon-image.btn-edtr-img(data-bind="click: imager.run, css:{ 'btn-dsbld': imager.adding() || user.changingBackground() }")
         input(tabindex="-1", accept="image/*", id="inp-imgs", type="file", multiple)
       .edtr-row.edtr-row-imgs.imgs-tbnls(data-bind="visible: images().length")
         .imgs-tbnls-in(data-bind="foreach: images, hscroll")
@@ -50,79 +122,16 @@ block content
       .edtr-row
         .btn.btn-wht(data-bind="click: clear, css:{ 'btn-dsbld': imager.adding }") Очистить
         .btn.pll-rght(data-bind="click: write, css:{ 'btn-dsbld': imager.adding }") Написать
-  .col-cnt
-    .col.col-w3
-      .row.row-rms
-        .btn.btn-rm.btn-tgl(data-bind="click: toggleSettings, css: { actv: settingsVisible }") Настройки
-        .btn.btn-rm.btn-tgl(data-bind="click: toggleHelp, css: { actv: helpVisible }") Справка
-      .col-hr
-      .row.row-rms(data-bind="foreach: allRooms")
-        .btn.btn-rm(data-bind="css: { actv: current }, click: goTo")
-          span(data-bind="text: nameTxt")
-          span.new-msg-cnt(data-bind="visible: newMessagesCount, text: '('+newMessagesCount()+')'")
-          
-    .col.col-w3.col-add.col-params(data-bind="visible: settingsVisible")
-      .col-hdr.col-hdr-scnd
-        Настройки
-        .btn.btn-wht.btn-close(data-bind="click: toggleSettings") ×
-      .col-hr
-      .col-lbl Список комнат ( через запятую ):
-      input.txt-blk.txt-params-rms(data-bind="arrayValue: user.rooms, arrayValueRegexp: '^\\\\w*[A-Za-z_]\\\\w*$'", placeholder="Введите список комнат")
-      .col-lbl Отправка сообщений по:
-      .btn(data-bind="css: { actv: user.writeShortcut() == 'ce' }, click: user.writeShortcut.bind($data, 'ce');") Сtrl(Cmd)+Enter
-      .sps-5px
-      .btn(data-bind="css: { actv: user.writeShortcut() == 'e' }, click: user.writeShortcut.bind($data, 'e');") Enter
-      .col-lbl Фоновое изображение:
-      .nowrap
-        input.txt-blk.txt-params-bkgimg(data-bind="value: user.backgroundImage, enable: !user.changingBackground(), css: { 'txt-dsbld': user.changingBackground() }", placeholder="Введите URL изображения")
-        input(tabindex="-1", accept="image/*", id="inp-params-bkg-img", type="file")
-        .sps-5px
-        .btn(data-bind="click: user.uploadBackgroundImage, css: { 'btn-dsbld': user.changingBackground() }") ...
-        .sps-5px
-        .btn(data-bind="click: user.backgroundImage.bind($data, ''), css: { 'btn-dsbld': !user.backgroundImage() || user.changingBackground() }") ×
-
-    .col.col-w3.col-add(data-bind="visible: helpVisible")
-      .col-hdr.col-hdr-scnd
-        Справка
-        .btn.btn-wht.btn-close(data-bind="click: toggleHelp") ×
-      .col-hr
-      .col-hlp-cnt
-        .col-lbl Доступные настройки:
-        ul.col-hlp
-          li.col-hlp-itm Список комнат
-          li.col-hlp-itm Быстрая клавиша для отправки сообщения
-          li.col-hlp-itm Фоновое изображения
-        .col-lbl Быстрые клавиши:
-        ul.col-hlp
-          li.col-hlp-itm Ctrl+Enter(Cmd+Enter) или Enter - написать
-          li.col-hlp-itm Shift+Scroll - вертикальная прокрутка строки изображений
-        .col-lbl Разметка в пределах строки:
-        ul.col-hlp
-          li.col-hlp-itm <strong>**жирный**</strong>
-          li.col-hlp-itm <em>*наклонный*</em>
-          li.col-hlp-itm <q>&gt;цитата</q>
-        .col-lbl Ссылки:
-        ul.col-hlp
-          li.col-hlp-itm /<em>&lt;room&gt;</em>/
-          li.col-hlp-itm /<em>&lt;post&gt;</em>/
-          li.col-hlp-itm /<em>&lt;room&gt;</em>/<em>&lt;post&gt;</em>/
-        .col-lbl Ограничения:
-        ul.col-hlp
-          li.col-hlp-itm <em>&lt;room&gt;</em> - имя комнаты может состоять только из символов A-Z a-z 0-9 _ и должен содержать хотябы один символ не цифру A-Z a-z _
-          li.col-hlp-itm <em>&lt;post&gt;</em> - номер поста может состоять только из цифр 0-9
-        .col-lbl Комнаты:
-        ul.col-hlp
-          li.col-hlp-itm Любой пользователь может создать комнату
-          li.col-hlp-itm Для создания комнаты достаточно войти в неё по адресу http://anonchat.pw/<имя_комнаты>/
-          li.col-hlp-itm Комнату можно добавить в список комнат в настройках для быстрого доступа
-        .col-lbl Лог сообщений:
-        ul.col-hlp
-          li.col-hlp-itm сохраняется только для комнаты /<em>b</em>/
-          li.col-hlp-itm для остальных комнат стирается после ухода последнего участника
-
+  .panel(data-bind="foreach: allRooms")
+      .btn.btn-rm(data-bind="css: { actv: current }, click: goTo")
+        span(data-bind="text: nameTxt")
+        span.new-msg-cnt(data-bind="visible: newMessagesCount, text: '('+newMessagesCount()+')'")
+      br
+      
 block script
   script(type='text/javascript', src="/socket.io/socket.io.js")
   script(type='text/javascript', src="/js/lib/soundmanager.js")
+  script(type='text/javascript', src="/js/lib/underscore.js")
   script(type='text/javascript', src="/js/lib/jquery.js")
   script(type='text/javascript', src="/js/lib/jquery/cookie.js")
   script(type='text/javascript', src="/js/lib/jquery/scrollTo.js")
@@ -147,6 +156,6 @@ block script
         }
       }, window.app);
     });
-  script(type='text/javascript', src="/js/room.js?v=2")
+  script(type='text/javascript', src="/js/room.js?v=3")
   <!-- Yandex.Metrika counter --><script type="text/javascript">(function (d, w, c) { (w[c] = w[c] || []).push(function() { try { w.yaCounter21782987 = new Ya.Metrika({id:21782987, clickmap:true, trackLinks:true, accurateTrackBounce:true, trackHash:true, ut:"noindex"}); } catch(e) { } }); var n = d.getElementsByTagName("script")[0], s = d.createElement("script"), f = function () { n.parentNode.insertBefore(s, n); }; s.type = "text/javascript"; s.async = true; s.src = (d.location.protocol == "https:" ? "https:" : "http:") + "//mc.yandex.ru/metrika/watch.js"; if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); } })(document, window, "yandex_metrika_callbacks");</script><noscript><div><img src="//mc.yandex.ru/watch/21782987?ut=noindex" style="position:absolute; left:-9999px;" alt="" /></div></noscript><!-- /Yandex.Metrika counter -->
 

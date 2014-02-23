@@ -60,10 +60,10 @@ $(document).ready(function() {
           return observableArray().join(', ');
         },
         write: function (arrayStr) {
-          var array = arrayStr.split(/\s*,\s*/).filter(function(val) { return val.match(arrayValueRegexp) });
+          var array = _.unique(arrayStr.split(/\s*,\s*/).filter(function(val) { return val.match(arrayValueRegexp) }));
           observableArray(array);
         }
-      });
+      }).extend({ notify: 'always' });
       ko.applyBindingsToNode(element, { value: interceptor });
     }
   };
@@ -626,7 +626,6 @@ $(document).ready(function() {
 
     self.toggleSettings = function() { self.settingsVisible() ? self.additionalForm(0) : self.additionalForm(2); };
     self.toggleHelp = function() { self.helpVisible() ? self.additionalForm(0) : self.additionalForm(1); };
-
     self.toggleSound = function() { self.soundEnabled(!self.soundEnabled()) };
 
 
