@@ -99,12 +99,13 @@ ChatUser.prototype.logMessage = function(message) {
     this.ip,
     'message write',
     '[uid:'+this.userId+'] wrote message /'+this.joinRoom+'/'+message.id+'/'+(
-      message.images.length  > 0 ? ' with images '+_.map(message.images, function(image) { return image.id }).join(', ') : ''
+      (message.images && message.images.length  > 0) ? ' with images '+_.map(message.images, function(image) { return image.id }).join(', ') : ''
     )
   );
 };
 
 ChatUser.prototype.writeMessage = function(req, message) {
+
   if( !this.isJoined() ) { req.io.emit('err', this.lib.error.message.write('отсутствует открытый чат', 'controller')); return; }
 
   var text = this.lib.text.prepare(message.text, this.joinRoom);
@@ -126,6 +127,7 @@ ChatUser.prototype.writeMessage = function(req, message) {
   var message = { text: text, images: images };
   
   var self = this;
+
   this.room.msg.add(message, function(err, message) {
     if( err ) { req.io.emit('err', self.lib.error.message.write()); return; }
     message.author = false;

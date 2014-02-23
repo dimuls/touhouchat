@@ -377,6 +377,11 @@ doesnotexist:-o-prefocus,
   font-size: 14px;
   padding-left: 15px;
 }
+.col .col-hlp-cnt {
+  max-height: 300px;
+  overflow-y: scroll;
+  padding-right: 5px;
+}
 .col .row {
   box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -487,13 +492,13 @@ doesnotexist:-o-prefocus,
   padding: 5px !important;
   overflow: hidden;
 }
-.imgs-tbnls-in {
+.imgs-tbnls .imgs-tbnls-in {
   white-space: nowrap;
   height: 200px;
   overflow-x: scroll;
   overflow-y: hidden;
 }
-.imgs-tbnls-big {
+.imgs-tbnls.imgs-tbnls-big {
   height: 110px;
 }
 .img-tbnl {

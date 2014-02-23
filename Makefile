@@ -1,7 +1,7 @@
 SITES_PATH = /sites
 APP_NAME = anonchat.pw
 PROJECT_PATH = $(SITES_PATH)/$(APP_NAME)
-LOG_PATH = $(SITES_PATH)/logs/$(APP_NAME)
+LOG_PATH = $(PROJECT_PATH)/log
 NGINX_ROOT = /etc/nginx
 APP_SCRIPT = app.js
 APP_USER = node
@@ -9,20 +9,18 @@ APP_USER = node
 paths:
 	mkdir -p $(SITES_PATH)/.config/sites-available/
 	mkdir -p $(SITES_PATH)/.config/sites-enabled/
-	mkdir -p $(PROJECT_PATH)
-	mkdir -p $(SITES_PATH)/logs/$(APP_NAME)
-	mkdir -p $(PROJECT_PATH)/upload/img/
 	mkdir -p $(SITES_PATH)/.forever
+	mkdir -p $(LOG_PATH)/nginx
+	mkdir -p $(PROJECT_PATH)/upload/img/
 	bash ./scripts/makeImgPaths.sh $(PROJECT_PATH)/upload/img/
 	chown -R node:www-data $(PROJECT_PATH)
-	chown -R node:node $(LOG_PATH)
 	chown -R node:node $(SITES_PATH)/.forever
 
 stop:
 	su -l $(APP_USER) -c 'NODE_ENV=production forever stop -p $(PROJECT_PATH)/.forever/ --sourceDir $(PROJECT_PATH) app.js'
 
 start:
-	su -l $(APP_USER) -c 'NODE_ENV=production forever start -p $(PROJECT_PATH)/.forever/ --sourceDir $(PROJECT_PATH) -l $(LOG_PATH)/forever.log -o $(LOG_PATH)/app.log -e $(LOG_PATH)/app-error.log -a app.js'
+	su -l $(APP_USER) -c 'NODE_ENV=production forever start -p $(PROJECT_PATH)/.forever/ --sourceDir $(PROJECT_PATH) -l $(LOG_PATH)/forever.log -o $(LOG_PATH)/app.log -e $(LOG_PATH)/error.log -a --minUptime 1000  --spinSleepTime 1000 app.js'
 
 restart:
 	make stop
@@ -36,6 +34,7 @@ deploy_app_static:
 	rm -rf $(PROJECT_PATH)/public
 	cp -R ./app/public $(PROJECT_PATH)
 	chown -R node:www-data $(PROJECT_PATH)
+	chmod og+r $(PROJECT_PATH)
 
 deploy_app:
 	-make stop
@@ -43,7 +42,6 @@ deploy_app:
 	cp -R ./app/node_modules $(PROJECT_PATH)
 	cp -R ./app/lib $(PROJECT_PATH)
 	cp -R ./app/model $(PROJECT_PATH)
-	cp -R ./app/public $(PROJECT_PATH)
 	cp -R ./app/routes $(PROJECT_PATH)
 	cp -R ./app/views $(PROJECT_PATH)
 	cp ./app/app.js $(PROJECT_PATH)

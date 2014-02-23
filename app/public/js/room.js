@@ -166,7 +166,7 @@ $(document).ready(function() {
     self.appGoTo = application.goTo;
 
     self.quote = function() {
-      var text = self.text();
+      var text = self.text().replace(/<\/p>/gi, "<\/p>\n");
       var quotedText = $(text).text().replace(/(\r?\n)\1+/gm, '$1').replace(/^/gm, '>');
       var oldText = editor.text();
       if( oldText && oldText.length && !oldText.match(/\n$/) ) {
@@ -176,7 +176,7 @@ $(document).ready(function() {
       editor.focusTextEnd();
     };
     self.quoteAnswer = function() {
-      var text = self.text();
+      var text = self.text().replace(/<\/p>/gi, "<\/p>\n");
       var quotedText = $(text).text().replace(/(\r?\n)\1+/gm, '$1').replace(/^/gm, '>');
       var oldText = editor.text();
       if( oldText && oldText.length && !oldText.match(/\n$/) ) {
@@ -466,6 +466,7 @@ $(document).ready(function() {
 
 
     // Scroll handling
+
     self.autoScrollEnabled = ko.observable(true);
 
     self.scrollToMessage = function(id) {

@@ -137,7 +137,7 @@ var WM = function() {
     var linkTmpl_type3 = '<a href="/'+room+'$1" data-bind="click: appGoTo.bind($data, \'/'+room+'$1\')">$1</a>';
 
 		if(this.options.makeAnonchatLinks) {
-      str = str.replace(/(?:\s|>|^)(\/\w*[A-Za-z_]\w*\/\d+\/)(?:\s|<|$)/g, function(match, link) {
+      str = str.replace(/(?:\s|>|&gt;|^)(\/\w*[A-Za-z_]\w*\/\d+\/)(?:\s|<|$)/g, function(match, link) {
         var parts = match.split('/')
         var res = parts[1] == room
           ? '<!-- anonchatLink(1,'+link+',/'+parts[2]+'/) -->'
@@ -145,12 +145,12 @@ var WM = function() {
         return parts[0]+res+parts[3];
       });
 
-      str = str.replace(/(?:\s|>|^)(\/\w*[A-Za-z_]\w*\/)(?:\s|<|$)/g, function(match, link) {
+      str = str.replace(/(?:\s|>|&gt;|^)(\/\w*[A-Za-z_]\w*\/)(?:\s|<|$)/g, function(match, link) {
         var parts = match.split('/')
         return parts[0]+'<!-- anonchatLink(2,'+link+') -->'+parts[2];
       });
 
-      str = str.replace(/(?:\s|>|^)(\/\d+\/)(?:\s|<|$)/g, function(match, link) {
+      str = str.replace(/(?:\s|>|&gt;|^)(\/\d+\/)(?:\s|<|$)/g, function(match, link) {
         var parts = match.split('/')
         return parts[0]+'<!-- anonchatLink(3,'+link+') -->'+parts[2];
       });

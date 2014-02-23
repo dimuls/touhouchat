@@ -30,6 +30,12 @@ exports['another room post'] = function(t) {
   t.done();
 };
 
+exports['quoted room link'] = function(t) {
+  t.expect(1);
+  t.strictEqual(w('&gt;/b/', 'b'), '<p><q>&gt;<a href="/b/" data-bind="click: appGoTo.bind($data, \'/b/\')">/b/</a></q></p>');
+  t.done();
+}
+
 exports['URL'] = function(t) {
   t.expect(3);
   t.strictEqual(w(' http://anonchat.pw/ ','b'), '<p><a target="_blank" href="http://anonchat.pw/">http://anonchat.pw/</a></p>');
